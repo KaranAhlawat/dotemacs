@@ -1,0 +1,11 @@
+auto-save-list/
+*~
+eln-cache/
+eshell/
+etc/
+fontaine-latest-state-file.eld
+history
+straight/
+transient/
+tree-sitter/
+var/
