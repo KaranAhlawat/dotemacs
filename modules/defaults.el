@@ -12,10 +12,12 @@
            ,(no-littering-expand-var-file-name "auto-save/")
            t))))
 
+(require 'autorevert)
 (setq global-auto-revert-non-file-buffers t)
 
 ;; Measure the startup time of  emacs
 (defun conf/display-startup-time ()
+  "Dispaly the time it took for Emacs to start in the minibuffer."
   (message "Emacs loaded in %s with %d GCs."
 	         (format "%.2f seconds"
 		               (float-time

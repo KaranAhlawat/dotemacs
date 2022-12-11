@@ -14,6 +14,7 @@
 
 ;; Hide the line numbering in certain modes as well
 (defun conf/disable-line-numbers-in-mode ()
+  "Disable `dispaly-line-numbers-mode' in a major-mode."
   (display-line-numbers-mode -1))
 
 (dolist (mode '(org-mode-hook eshell-mode-hook))
@@ -34,19 +35,19 @@
 
   (fontaine-presets
    '((small
-      :default-height 120)
+      :default-height 130)
      (regular
-      :default-height 160)
+      :default-height 150)
      (large
       :default-weight semilight
-      :default-height 160
+      :default-height 170
       :bold-weight extrabold)
      (extra-large
       :default-weight semilight
-      :default-height 180
+      :default-height 190
       :bold-weight extrabold)
      (t
-      :default-family "Iosevka SS18"
+      :default-family "Cousine"
       :default-weight normal
       :variable-pitch-weight regular
       :variable-pitch-height 1.0

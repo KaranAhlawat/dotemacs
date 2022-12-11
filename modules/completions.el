@@ -124,7 +124,7 @@
                                    corfu-auto nil)
               (corfu-mode)))
   
-  (global-corfu-mode t))
+  (global-corfu-mode 1))
 
 (provide 'completions)
 ;;; completions.el ends here

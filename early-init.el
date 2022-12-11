@@ -8,7 +8,7 @@
 
 ;; Customize native compilation
 (setq native-comp-async-report-warnings-errors 'silent)
-(setq native-comp-deferred-compilation t)
+(setq inhibit-automatic-native-compilation t)
 (add-to-list 'native-comp-eln-load-path
 	     (locate-user-emacs-file "eln-cache/"))
 
@@ -27,12 +27,19 @@
 ;; Do not resize the frame at this early stage.
 (setq frame-inhibit-implied-resize t)
 
-;; This essentially sets the size in pixels of the frame. Currently at
-;; 1200x900.
-(dolist (var '(default-frame-alist initial-frame-alist))
-  (add-to-list var '(width . (text-pixels . 1200)))
-  (add-to-list var '(height . (text-pixels . 900))))
-
+;; Set some properties on the default and initial frames
+(setq default-frame-alist `((vertical-scroll-bars . nil)
+                            (horizontal-scroll-bars . nil)
+                            (fullscreen . maximized)
+                            (undecorated . t)
+                            (menu-bar-lines . 0)
+                            (tool-bar-lines . 0)))
+(setq initial-frame-alist `((vertical-scroll-bars . nil)
+                            (horizontal-scroll-bars . nil)
+                            (fullscreen . maximized)
+                            (undecorated . t)
+                            (menu-bar-lines . 0)
+                            (tool-bar-lines . 0)))
 
 ;; Reducing the GUI clutter. I recommend not doing this if just
 ;; getting started with emacs, as they help massively in
