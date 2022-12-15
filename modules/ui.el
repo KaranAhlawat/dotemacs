@@ -35,20 +35,20 @@
 
   (fontaine-presets
    '((small
-      :default-height 130)
+      :default-height 140)
      (regular
-      :default-height 150)
+      :default-height 160)
      (large
       :default-weight semilight
-      :default-height 170
+      :default-height 180
       :bold-weight extrabold)
      (extra-large
       :default-weight semilight
-      :default-height 190
+      :default-height 200
       :bold-weight extrabold)
      (t
-      :default-family "Cousine"
-      :default-weight normal
+      :default-family "Iosevka Comfy"
+      :default-weight regular
       :variable-pitch-weight regular
       :variable-pitch-height 1.0
       :bold-family nil ; use whatever the underlying face has

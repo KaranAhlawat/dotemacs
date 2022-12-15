@@ -27,7 +27,7 @@
   :custom
   (completion-styles '(fussy))
   :config
-  (setq fussy-filter-fn 'fussy-filter-flex)
+  (setq fussy-filter-fn 'fussy-filter-default)
   (setq fussy-use-cache t)
   (setq fussy-compare-same-score-fn 'fussy-histlen->strlen<)
 
@@ -70,7 +70,7 @@
   :straight nil
   :config
   (defun conf/fussy-fido-setup ()
-    "Use `fussy' with `fido-mode'."
+    "Use `fussy' with `fido-vertical-mode'."
     (setq-local completion-styles '(fussy basic)))
   (advice-add 'icomplete--fido-mode-setup :after 'conf/fussy-fido-setup)
   (setq icomplete-tidy-shadowed-file-names t
@@ -117,14 +117,14 @@
               ("S-TAB"   . corfu-previous)
               ([backtab] . corfu-previous)
               ("RET"     . corfu-insert))
+  :init
+  (global-corfu-mode)
   :config
   (add-hook 'eshell-mode-hook
             (lambda () (setq-local corfu-quit-at-boundary t
                                    corfu-quit-no-match t
                                    corfu-auto nil)
-              (corfu-mode)))
-  
-  (global-corfu-mode 1))
+              (corfu-mode))))
 
 (provide 'completions)
 ;;; completions.el ends here
