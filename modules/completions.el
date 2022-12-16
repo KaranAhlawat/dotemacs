@@ -68,6 +68,8 @@
 (use-package icomplete
   :ensure nil
   :straight nil
+  :bind (:map minibuffer-local-completion-map
+	      ("SPC" . #'just-one-space))
   :config
   (defun conf/fussy-fido-setup ()
     "Use `fussy' with `fido-vertical-mode'."

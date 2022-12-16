@@ -47,7 +47,7 @@
       :default-height 200
       :bold-weight extrabold)
      (t
-      :default-family "Iosevka Comfy"
+      :default-family "PragmataPro Mono"
       :default-weight regular
       :variable-pitch-weight regular
       :variable-pitch-height 1.0
