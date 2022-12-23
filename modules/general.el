@@ -7,7 +7,7 @@
 ;; Makes it easier to see where what is
 (use-package rainbow-delimiters
   :straight t
-  :hook prog-mode)
+  :hook (lisp-mode emacs-lisp-mode cider-mode cider-repl-mode clojure-mode))
 
 ;; Either act on the whole line or the current region
 (use-package whole-line-or-region

@@ -35,19 +35,19 @@
 
   (fontaine-presets
    '((small
-      :default-height 140)
+      :default-height 130)
      (regular
-      :default-height 160)
+      :default-height 150)
      (large
       :default-weight semilight
-      :default-height 180
+      :default-height 170
       :bold-weight extrabold)
      (extra-large
       :default-weight semilight
-      :default-height 200
+      :default-height 190
       :bold-weight extrabold)
      (t
-      :default-family "PragmataPro Mono"
+      :default-family "Input Mono Narrow"
       :default-weight regular
       :variable-pitch-weight regular
       :variable-pitch-height 1.0
@@ -98,7 +98,7 @@
      (t . (variable-pitch 1.1))))
   
   :config
-  (load-theme 'standard-dark :no-confirm))
+  (load-theme 'standard-light :no-confirm))
 
 ;; Cuz I may have the memory of a fish
 (use-package which-key
