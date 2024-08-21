@@ -13,17 +13,6 @@
   (magit-display-buffer-function
    #'magit-display-buffer-same-window-except-diff-v1))
 
-(use-package git-gutter
-  :hook (prog-mode . git-gutter-mode)
-  :config
-  (setq git-gutter:update-interval 0.02))
-
-(use-package git-gutter-fringe
-  :config
-  (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
-
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :hook (((heex-ts-mode
@@ -70,12 +59,6 @@
     (lsp-elixir-server-command '("/home/karan/repos/lexical/_build/dev/package/lexical/bin/start_lexical.sh")))
 
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-stdio-connection '("/home/karan/repos/lexical/_build/dev/package/lexical/bin/start_lexical.sh"))
-                    :multi-root t
-                    :activation-fn (lsp-activate-on "elixir" "phoenix-heex")
-                    :server-id 'lexical))
-
-  (lsp-register-client
    (make-lsp-client :new-connection (lsp-stdio-connection '("cs"
                                                             "launch"
                                                             "software.amazon.smithy:smithy-language-server:0.4.0"
@@ -94,13 +77,6 @@
                     :server-id 'smithy-ls))
 
   (push '("\\.smithy$" . "smithy") lsp-language-id-configuration)
-  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
-  (advice-add (if (progn (require 'json)
-                         (fboundp 'json-parse-buffer))
-                  'json-parse-buffer
-                'json-read)
-              :around
-              #'lsp-booster--advice-json-parse)
   (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
 
   (use-package evil-core
@@ -136,10 +112,10 @@
 (use-package eldoc-box
   :after eldoc
   :hook (eldoc-mode . eldoc-box-hover-mode)
-  :init
-  (setq eldoc-box-only-multi-line t)
-  (setq eldoc-box-clear-with-C-g t)
-  (setq eldoc-box-max-pixel-width 500))
+  :custom
+  (eldoc-box-only-multi-line t)
+  (eldoc-box-clear-with-C-g t)
+  (eldoc-box-max-pixel-width 500))
 
 (use-package smartparens
   :demand t
@@ -188,7 +164,6 @@
          (tsx-ts-mode . eslintd-fix-mode)))
 
 (use-package markdown-mode
-  :demand t
   :mode ("README\\.md\\'" . gfm-mode)
   :bind (:map markdown-mode-map ("C-c C-e" . markdown-do)))
 

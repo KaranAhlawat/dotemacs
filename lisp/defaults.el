@@ -51,6 +51,7 @@
 
 ;; Exec path is taken from shell
 (use-package exec-path-from-shell
+  :demand t
   :init
   (setq exec-path-from-shell-arguments '("--login"))
   :config

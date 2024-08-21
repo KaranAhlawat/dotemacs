@@ -48,8 +48,6 @@
 	 (concat (file-name-as-directory user-emacs-directory) "lisp/")))
 
 (set-default-coding-systems 'utf-8)
-(setq load-suffixes (list ".so" ".eln" ".elc" ".el"))
-(setq load-prefer-newer t)
 
 ;; Setting the custom file
 (setq custom-file (locate-user-emacs-file "custom.el"))

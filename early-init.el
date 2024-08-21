@@ -6,7 +6,7 @@
 
 ;; Load the latest version of a file in `load', if an extension is not
 ;; specified.
-(setq load-prefer-newer noninteractive)
+(setq load-prefer-newer t)
 
 ;; Customize native compilation
 (setq byte-compile-warnings '(not obsolete))

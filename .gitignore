@@ -20,3 +20,5 @@ elisp-autofmt-cache/
 .eask/
 fontaine-latest-state.eld
 elpaca
+.lsp-session*
+.dap-*
