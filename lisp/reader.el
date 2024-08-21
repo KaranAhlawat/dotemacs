@@ -4,7 +4,7 @@
 ;;; Code:
 
 (use-package doc-view
-  :straight (:type built-in)
+  :ensure nil
   :init
   (setq doc-view-mupdf-use-svg t))
 

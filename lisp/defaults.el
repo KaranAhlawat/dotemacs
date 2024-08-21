@@ -5,7 +5,6 @@
 
 ;; Littering is bad. Stop it. Get some help.
 (use-package no-littering
-  :straight t
   :config
   (setq auto-save-file-name-transforms
         `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
@@ -22,7 +21,7 @@
                     (time-subtract after-init-time before-init-time)))
            gcs-done))
 
-(add-hook 'emacs-startup-hook #'conf/display-startup-time)
+(add-hook 'elpaca-after-init-hook #'conf/display-startup-time)
 (global-auto-revert-mode 1)
 
 ;; Try to tame the TAB
@@ -52,7 +51,6 @@
 
 ;; Exec path is taken from shell
 (use-package exec-path-from-shell
-  :straight t
   :init
   (setq exec-path-from-shell-arguments '("--login"))
   :config
@@ -60,20 +58,9 @@
   (exec-path-from-shell-initialize))
 
 (use-package delsel
-  :straight (:type built-in)
+  :ensure nil
   :config
   (delete-selection-mode))
-
-(use-package smart-tab
-  :straight t
-  :functions
-  global-smart-tab-mode
-  :custom
-  (smart-tab-completion-functions-alist '((text-mode . dabbrev-completion)))
-  (smart-tab-expand-eolp t)
-  (smart-tab-user-provided-completion-function 'completion-at-point)
-  :config
-  (global-smart-tab-mode))
 
 (provide 'defaults)
 ;;; defaults.el ends here

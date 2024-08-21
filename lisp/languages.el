@@ -4,7 +4,7 @@
 ;;; Code:
 
 (use-package treesit
-  :straight (:type built-in)
+  :ensure nil
   :custom
   (treesit-font-lock-level 4)
   :config
@@ -42,11 +42,10 @@
             (shell-script-mode . bash-ts-mode))))
 
 (use-package ts-query-highlight
-  :straight (:type git :host sourcehut :repo "meow_king/ts-query-highlight"))
+  :ensure (:type git :host sourcehut :repo "meow_king/ts-query-highlight"))
 
 ;; Cider for clojure
 (use-package cider
-  :straight t
   :custom
   (cider-repl-pop-to-buffer-on-connect nil)
   (cider-repl-display-help-banner nil)
@@ -54,7 +53,6 @@
 
 ;; Web Stuff
 (use-package web-mode
-  :straight t
   :mode (("\\.html?\\'" . web-mode))
   :custom
   (web-mode-enable-auto-pairing t)
@@ -67,32 +65,29 @@
   (web-mode-attr-value-indent-offset 2))
 
 (use-package js
-  :straight (:type built-in)
+  :ensure nil
   :custom
   (js-indent-level 2))
 
 (use-package python
-  :straight (:type built-in)
+  :ensure nil
   :custom
   (python-indent-offset 4)
   (python-indent-guess-indent-offset nil)
   (python-indent-guess-indent-offset-verbose nil))
 
-(use-package micromamba
-  :straight t)
-
 (use-package css-mode
-  :straight (:type built-in)
+  :ensure nil
   :custom
   (css-indent-offset 2))
 
 (use-package java-ts-mode
-  :straight (:type built-in)
+  :ensure nil
   :custom
   (java-ts-mode-indent-offset 2))
 
 (use-package typescript-ts-mode
-  :straight (:type built-in)
+  :ensure nil
   :mode (("\\.jsx\\'" . js-jsx-mode)
          ("\\.tsx\\'" . tsx-ts-mode)
          ("\\.ts\\'" . typescript-ts-mode))
@@ -102,35 +97,33 @@
 ;; Scala TS (local)
 (use-package scala-ts-mode
   :mode "\\.scala\\'"
-  :straight (:local-repo "/home/karan/repos/scala-ts-mode")
+  :ensure (:repo "/home/karan/repos/scala-ts-mode")
   :init
   (setq scala-ts-indent-offset 4))
 
 (use-package fsharp-ts-mode
   :mode "\\.fs\\'"
-  :straight (:local-repo "/home/karan/repos/fsharp-ts-mode")
+  :ensure (:repo "/home/karan/repos/fsharp-ts-mode")
   :init
   (setq fsharp-ts-indent-offset 4))
 
 (use-package reason-ts-mode
   :mode "\\.re\\'"
-  :straight (:local-repo "/home/karan/repos/reason-ts-mode"))
+  :ensure (:repo "/home/karan/repos/reason-ts-mode"))
 
 (use-package yaml-ts-mode
-  :straight (:type built-in))
+  :ensure nil)
 
-(use-package tuareg
-  :straight t)
+(use-package tuareg)
 
 (use-package ocaml-ts-mode
-  :straight ( :type git
-              :host github
-              :repo "terrateamio/ocaml-ts-mode" )
+  :ensure ( :type git
+            :host github
+            :repo "terrateamio/ocaml-ts-mode" )
   :after tuareg
   :mode "\\.ml\\'")
 
-(use-package smithy-mode
-  :straight t)
+(use-package smithy-mode)
 
 (provide 'languages)
 ;;; languages.el ends here

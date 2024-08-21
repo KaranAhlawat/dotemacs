@@ -8,7 +8,6 @@
       fit-frame-to-buffer t)
 
 (use-package beframe
-  :straight t
   :init
   (setq beframe-global-buffers
         '("*Messages*" "*Org Agenda*" "*scratch*"))
@@ -112,7 +111,6 @@
   "Shackle rules for message-modes-list.")
 
 (use-package shackle
-  :straight t
   :config
   (setq shackle-select-reused-windows nil)
   (setq shackle-default-size 0.33)

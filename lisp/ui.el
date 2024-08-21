@@ -37,7 +37,6 @@
 (blink-cursor-mode -1)
 
 (use-package fontaine
-  :straight t
   :bind ("C-c f" . #'fontaine-set-preset)
   :init
   (setq x-underline-at-descent-line t)
@@ -82,7 +81,6 @@
   (add-hook 'kill-emacs-hook #'fontaine-store-latest-preset))
 
 (use-package doom-themes
-  :straight t
   :custom
   (doom-themes-enable-bold nil)
   (doom-oksolar-dark-brighter-comments t)
@@ -97,13 +95,8 @@
     '(font-lock-comment-face :inherit 'italic))
   (load-theme 'doom-one t))
 
-;; (use-package autothemer
-;;   :straight t)
-;; (load-theme 'oxocarbon t)
-
 ;; Cuz I may have the memory of a fish
 (use-package which-key
-  :straight t
   :custom
   (which-key-idle-delay 0.5)
   :config
@@ -112,7 +105,6 @@
 
 ;; A more minimal modeline. Maybe someday I'll actually customize the defualt in-built one.
 (use-package doom-modeline
-  :straight t
   :init
   (setq doom-modeline-icon nil)
   :config

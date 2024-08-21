@@ -4,7 +4,6 @@
 ;;; Code:
 
 (use-package evil
-  :straight t
   :demand t
   :bind (( "<escape>" . keyboard-escape-quit )
          :map evil-normal-state-map
@@ -42,7 +41,6 @@
   (evil-mode t))
 
 (use-package evil-collection
-  :straight t
   :after evil
   :bind ( :map evil-normal-state-map
           ( "f"  . #'evil-avy-goto-char-in-line )
@@ -56,24 +54,20 @@
   (evil-collection-init))
 
 (use-package evil-goggles
-  :straight t
   :config
   (evil-goggles-mode)
   (evil-goggles-use-diff-faces))
 
 (use-package evil-commentary
-  :straight t
   :after evil
   :config
   (evil-commentary-mode))
 
 (use-package evil-surround
-  :straight t
   :config
   (global-evil-surround-mode))
 
 (use-package evil-leader
-  :straight t
   :after evil
   :config
   (evil-leader/set-leader "<SPC>")
@@ -103,14 +97,12 @@
   (global-evil-leader-mode))
 
 (use-package evil-cleverparens
-  :straight t
   :after (evil smartparens)
   :hook ((clojure-mode emacs-lisp-mode lisp-mode) . evil-cleverparens-mode)
   :config
   (push 'evil-cp-change evil-change-commands))
 
-(use-package avy
-  :straight t)
+(use-package avy)
 
 (provide 'keybindings)
 ;;; keybindings.el ends here

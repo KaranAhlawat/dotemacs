@@ -22,7 +22,6 @@
 
 ;; ORG CONFIGURATION
 (use-package org
-  :straight t
   :hook
   ((org-mode . visual-line-mode)
    (org-mode . turn-on-org-cdlatex)
@@ -76,7 +75,6 @@
      '((sql . t)))))
 
 (use-package org-modern
-  :straight t
   :hook ((org-mode . org-modern-mode)
          (org-agenda-finalize . org-modern-agenda))
   :custom

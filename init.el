@@ -2,6 +2,44 @@
 ;;; Commentary:
 ;;; This file ties all the modules together
 ;;; Code:
+(defvar elpaca-installer-version 0.7)
+(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                              :ref nil :depth 1
+                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (< emacs-major-version 28) (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                 ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+                                                 ,@(when-let ((depth (plist-get order :depth)))
+                                                     (list (format "--depth=%d" depth) "--no-single-branch"))
+                                                 ,(plist-get order :repo) ,repo))))
+                 ((zerop (call-process "git" nil buffer t "checkout"
+                                       (or (plist-get order :ref) "--"))))
+                 (emacs (concat invocation-directory invocation-name))
+                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                 ((require 'elpaca))
+                 ((elpaca-generate-autoloads "elpaca" repo)))
+            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (load "./elpaca-autoloads")))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
 
 ;; Add ~/.config/emacs/lisp to the load-path
 (eval-and-compile
@@ -13,35 +51,16 @@
 (setq load-suffixes (list ".so" ".eln" ".elc" ".el"))
 (setq load-prefer-newer t)
 
-;; Straight.el is my current package manager of choice, even with the
-;; recent improvements to package.el in Emacs >=29. Also, since
-;; use-package is now built into Emacs itself, I'll be opting to use
-;; that and it's straight.el intergration.
-
-;; Here we're just bootstraping straight.el as noted in their github README.
-(defvar bootstrap-version)
-(defvar straight-repository-branch nil)
-(setq straight-repository-branch "develop")
-(let ((bootstrap-file
-			 (expand-file-name "straight/repos/straight.el/bootstrap.el"
-												 user-emacs-directory))
-			(bootstrap-version 6))
-	(unless (file-exists-p bootstrap-file)
-		(with-current-buffer
-				(url-retrieve-synchronously
-				 "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-				 'silent
-				 'inhibit-cookies)
-			(goto-char (point-max))
-			(eval-print-last-sexp)))
-	(load bootstrap-file nil 'nomessage))
-
-(straight-use-package 'org)
-
 ;; Setting the custom file
 (setq custom-file (locate-user-emacs-file "custom.el"))
-(when (file-exists-p custom-file)
-	(load custom-file nil 'nomessage))
+(add-hook 'elpaca-after-init-hook
+          (lambda ()
+            (when (file-exists-p custom-file)
+	            (load custom-file nil 'nomessage))))
+
+(elpaca elpaca-use-package
+  (elpaca-use-package-mode)
+  (setq use-package-always-ensure t))
 
 ;; Enable some disabled commands
 (put 'dired-find-alternate-file 'disabled nil)
@@ -50,7 +69,6 @@
 (require 'windows)
 
 (use-package popper
-	:straight t
   :demand t
 	:bind
 	(("C-`" . popper-toggle)
@@ -58,7 +76,6 @@
 	 ("C-c p t" . popper-toggle-type)
 	 ("C-M-q" . popper-kill-latest-popup))
 	:init
-	(setq popper-group-function #'popper-group-by-project)
 	(setq popper-reference-buffers
 				(append
 				 conf/help-modes-list
@@ -96,7 +113,7 @@
 										 (direction . below)
 										 (body-function . ,#'select-window)))))
   (setq popper-display-control t)
-  
+
   :config
 	(advice-add
 	 'popper-cycle
@@ -108,48 +125,48 @@
 				(define-key map (kbd "`") #'popper-cycle)
 				map))))
 
-	(use-package
-		popper-echo
-		:defer 3
-		:init
-		(defun popper-message-shorten (name)
-			(cond
+	(use-package popper-echo
+    :ensure nil
+	  :init
+	  (defun popper-message-shorten (name)
+		  (cond
 			 ((string-match "^\\*[hH]elpful.*?: \\(.*\\)\\*$" name)
-				(concat (match-string 1 name) "(H)"))
+			  (concat (match-string 1 name) "(H)"))
 			 ((string-match "^\\*Help:?\\(.*\\)\\*$" name)
-				(concat (match-string 1 name) "(H)"))
+			  (concat (match-string 1 name) "(H)"))
 			 ((string-match "^\\*eshell:? ?\\(.*\\)\\*$" name)
-				(concat
+			  (concat
 				 (match-string 1 name)
 				 (if (string-empty-p (match-string 1 name))
 						 "shell(E)"
 					 "(E)")))
 			 ((string-match "^\\*\\(.*?\\)\\(?:Output\\|Command\\)\\*$" name)
-				(concat (match-string 1 name) "(O)"))
+			  (concat (match-string 1 name) "(O)"))
 			 ((string-match "^\\*\\(.*?\\)[ -][Ll]og\\*$" name)
-				(concat (match-string 1 name) "(L)"))
+			  (concat (match-string 1 name) "(L)"))
 			 ((string-match "^\\*[Cc]ompil\\(?:e\\|ation\\)\\(.*\\)\\*$" name)
-				(concat (match-string 1 name) "(C)"))
+			  (concat (match-string 1 name) "(C)"))
 			 (t
-				name)))
-		(setq popper-mode-line
-					'(:eval (propertize " POP " 'face 'mode-line-highlight)))
-		(setq popper-echo-transform-function #'popper-message-shorten)
-		(setq
+			  name)))
+	  (setq popper-mode-line
+				  '(:eval (propertize " POP " 'face 'mode-line-highlight)))
+	  (setq popper-echo-transform-function #'popper-message-shorten)
+	  (setq
 		 popper-echo-dispatch-keys '(?0 ?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8 ?9)
 		 popper-echo-dispatch-actions t)
     :config
-		(advice-add
+	  (advice-add
 		 'popper-echo
 		 :around
 		 (defun conf/popper-echo-no-which-key (orig-fn)
 			 (let ((which-key-show-transient-maps nil))
 				 (funcall orig-fn))))
-		(popper-echo-mode))
+	  (popper-echo-mode))
 
 	(popper-mode))
 
 (use-package custom
+  :ensure nil
 	:init
 	(defvar after-enable-theme-hook nil)
 	(defun run-after-enable-theme-hook (&rest _args)

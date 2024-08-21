@@ -4,23 +4,22 @@
 ;;; Code:
 
 (use-package savehist
-  :straight (:type built-in)
+  :ensure nil
   :config
   (savehist-mode))
 
 ;; Those quick annotations are really helpful
 (use-package marginalia
-  :straight t
   :custom
-  (marginalia-annotators
+  (0marginalika-annotators
    '(marginalia-annotators-heavy marginalia-annotators-light nil))
   (marginalia-align 'right)
   :config
   (marginalia-mode))
 
 (use-package vertico
-  :straight (vertico :files (:defaults "extensions/*.el")
-                     :includes (vertico-directory))
+  :ensure (vertico :files (:defaults "extensions/*.el")
+                   :includes (vertico-directory))
   :bind
   (:map vertico-map
         ("TAB" . #'vertico-insert)
@@ -32,7 +31,7 @@
   :config (vertico-mode))
 
 (use-package minibuffer
-  :straight (:type built-in)
+  :ensure nil
   :bind ( :map minibuffer-local-completion-map
           ("<up>" . minibuffer-previous-line-completion)
           ("<down>" . minibuffer-next-line-completion))
@@ -57,7 +56,7 @@
 
 ;; A few more useful configurations
 (use-package crm
-  :straight (:type built-in)
+  :ensure nil
   :config
   (defun crm-indicator (args)
     "Add prompt indicator to `completing-read-multiple' with ARGS.
@@ -73,7 +72,6 @@ comma."
 
 ;; Tempel for expansion - May remove this in the future as I don't use it alot.
 (use-package tempel
-  :straight t
   :bind (("M-+" . #'tempel-complete)
          ("M-*" . #'tempel-insert)
          :map tempel-map
@@ -83,7 +81,6 @@ comma."
 
 (use-package orderless
   :after vertico
-  :straight t
   :init
   (setq completion-styles '(orderless partial-completion basic)
         completion-category-defaults nil
@@ -91,13 +88,11 @@ comma."
         orderless-matching-styles '(orderless-literal orderless-initialism orderless-flex)))
 
 (use-package cape
-  :straight t
   :config
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file))
 
 (use-package corfu
-  :straight t
   :custom
   (corfu-cycle t)
   (corfu-auto t)
@@ -129,8 +124,6 @@ comma."
               t)))
 
 (use-package consult
-  :straight t
-  :demand t
   :bind (("M-g i" . consult-imenu)
          ("C-x b" . consult-buffer)
          ("C-x 4 b" . consult-buffer-other-window)
@@ -156,12 +149,10 @@ comma."
    :preview-key "M-."))
 
 (use-package consult-flycheck
-  :straight t
   :after consult
   :bind ("M-g f" . consult-flycheck))
 
 (use-package consult-lsp
-  :straight t
   :after consult
   :config
   (define-key lsp-mode-map [remap xref-find-apropos] #'consult-lsp-symbols)

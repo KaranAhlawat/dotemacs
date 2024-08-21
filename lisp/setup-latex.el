@@ -5,7 +5,7 @@
 
 ;; AUCTEX
 (use-package tex
-  :straight auctex
+  :ensure auctex
   :defer t
   :hook ((LaTeX-mode . prettify-symbols-mode)
          (LaTeX-mode . turn-on-auto-fill)
@@ -45,7 +45,6 @@
           (cadr latex-list) "%l")))
 
 (use-package cdlatex
-  :straight t
   :after tex
   :hook (LaTeX-mode . turn-on-cdlatex)
   :bind ( :map cdlatex-mode-map

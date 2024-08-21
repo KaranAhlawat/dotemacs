@@ -5,7 +5,7 @@
 ;;; Code:
 
 (use-package emacs
-  :straight (:type built-in)
+  :ensure nil
   :init
   (setq frame-title-format "%b")
   (setq ring-bell-function 'ignore)
@@ -21,18 +21,16 @@
 
 ;; Makes it easier to see where what is
 (use-package rainbow-delimiters
-  :straight t
   :hook
   (lisp-mode emacs-lisp-mode cider-mode cider-repl-mode clojure-mode))
 
 ;; Either act on the whole line or the current region
 (use-package whole-line-or-region
-  :straight t
   :config
   (whole-line-or-region-global-mode))
 
 (use-package smtpmail
-  :straight (:type built-in)
+  :ensure nil
   :config
   (setq
    user-full-name "Karan Ahlawat"
@@ -43,7 +41,7 @@
    send-mail-function 'smtpmail-send-it))
 
 (use-package project
-  :straight (:type built-in)
+  :ensure nil
   :custom
   (project-vc-extra-root-markers
    '(".project"
@@ -81,6 +79,7 @@
      "eln-cache"
      ".git"))
   :config
+	(setq popper-group-function #'popper-group-by-project)
   (setopt
    project-switch-commands
    '((project-find-file "Find file")
@@ -94,7 +93,7 @@
   (keymap-set project-prefix-map "<delete>" #'project-forget-project))
 
 (use-package dired
-  :straight (:type built-in)
+  :ensure nil
   :hook ((dired-mode . dired-hide-details-mode) (dired-mode . hl-line-mode))
   :config
   (setq
@@ -109,7 +108,7 @@
    dired-mouse-drag-files t))
 
 (use-package dired-aux
-  :straight (:type built-in)
+  :ensure nil
   :config
   (setq
    dired-isearch-filenames 'dwim
@@ -118,7 +117,7 @@
    dired-do-revert-buffer (lambda (dir) (not (file-remote-p dir)))))
 
 (use-package dired-x
-  :straight (:type built-in)
+  :ensure nil
   :config
   (setq
    dired-clean-up-buffers-too t
@@ -126,7 +125,6 @@
    dired-x-hands-off-my-keys t))
 
 (use-package pulsar
-  :straight t
   :init
   (setq pulsar-pulse t)
   (setq pulsar-delay 0.05)
@@ -141,44 +139,38 @@
 (repeat-mode +1)
 
 (use-package ctrlf
-  :straight t
   :init
   (setq ctrlf-default-search-style 'fuzzy)
   :config
   (ctrlf-mode +1))
 
 (use-package nerd-icons
-  :straight t
   :custom
   (nerd-icons-scale-factor 1.2))
 
 (use-package nerd-icons-dired
-  :straight t
   :hook
   (dired-mode . nerd-icons-dired-mode))
 
 (use-package nerd-icons-completion
-  :straight t
   :config
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)
   (nerd-icons-completion-mode))
 
 (use-package nerd-icons-corfu
-  :straight t
   :after corfu
   :config
   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 (use-package recentf
-  :straight (:type built-in)
+  :ensure nil
   :init
   (setq recentf-max-saved-items 50)
-  (add-hook 'after-init-hook (lambda ()
+  (add-hook 'elpaca-after-init-hook (lambda ()
                                (recentf-load-list)
                                (recentf-mode))))
 
 (use-package helpful
-  :straight t
   :bind (("C-h f" . #'helpful-callable)
          ("C-h v" . #'helpful-variable)
          ("C-h k" . #'helpful-key)

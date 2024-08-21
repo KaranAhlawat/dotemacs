@@ -4,7 +4,6 @@
 ;;; Code:
 
 (use-package pcmpl-args
-  :straight t
   :hook
   ((eshell-mode . conf/pcmpl-args-pcomplete-settings))
   :config
@@ -18,7 +17,7 @@
                   t))))
 
 (use-package eshell
-  :straight (:type built-in)
+  :ensure nil
   :hook
   ((eshell-mode . conf/eshell-setup-modes)
    (eshell-first-time-mode . conf/eshell-first-load-settings)
@@ -47,7 +46,7 @@
 
 ;; Eshell appearance
 (use-package eshell
-  :straight (:type built-in)
+  :ensure nil
   :config
   (setq
    eshell-prompt-regexp "^.* λ "
@@ -129,7 +128,7 @@
 
 
 (use-package shell
-  :straight (:type built-in)
+  :ensure nil
   :hook
   (;; (shell-mode . (lambda () (corfu-mode -1)))
    (shell-mode . (lambda () (display-line-numbers-mode -1)))
