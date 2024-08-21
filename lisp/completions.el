@@ -31,12 +31,6 @@
   (vertico-preselect 'directory)
   :config (vertico-mode))
 
-(use-package vertico-posframe
-  :straight t
-  :after vertico
-  :config
-  (vertico-posframe-mode))
-
 (use-package minibuffer
   :straight (:type built-in)
   :bind ( :map minibuffer-local-completion-map

@@ -148,10 +148,7 @@
   (ctrlf-mode +1))
 
 (use-package nerd-icons
-  :straight (:type git
-                   :host github
-                   :repo "rainstormstudio/nerd-icons.el"
-                   :files ("*"))
+  :straight t
   :custom
   (nerd-icons-scale-factor 1.2))
 

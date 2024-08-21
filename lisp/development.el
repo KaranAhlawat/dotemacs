@@ -6,6 +6,7 @@
 ;; Magit, the magical git interface
 (use-package magit
   :straight t
+  :defer t
   :custom
   (magit-display-buffer-function
    #'magit-display-buffer-same-window-except-diff-v1))
@@ -24,7 +25,7 @@
   (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
 
 (use-package lsp-mode
-  :straight (lsp-mode :type git :host github :repo "emacs-lsp/lsp-mode")
+  :straight t
   :commands (lsp lsp-deferred)
   :hook (((heex-ts-mode
            elixir-ts-mode
