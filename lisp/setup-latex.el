@@ -5,7 +5,11 @@
 
 ;; AUCTEX
 (use-package tex
-  :ensure auctex
+  :ensure ( :repo "https://git.savannah.gnu.org/git/auctex.git" :branch "main"
+            :pre-build (("make" "elpa"))
+            :build (:not elpaca--compile-info) ;; Make will take care of this step
+            :files ("*.el" "doc/*.info*" "etc" "images" "latex" "style")
+            :version (lambda (_) (require 'tex-site) AUCTeX-version))
   :defer t
   :hook ((LaTeX-mode . prettify-symbols-mode)
          (LaTeX-mode . turn-on-auto-fill)
