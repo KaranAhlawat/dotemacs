@@ -8,6 +8,12 @@
       fit-frame-to-buffer t)
 
 (use-package beframe
+  :demand t
+  :defines (beframe-global-buffers
+            beframe-functions-in-frames
+            beframe-create-frame-scratch-buffer
+            beframe-kill-frame-scratch-buffer
+            beframe-rename-function)
   :init
   (setq beframe-global-buffers
         '("*Messages*" "*Org Agenda*" "*scratch*"))
@@ -85,7 +91,7 @@
   "Shackle rules for repl-names-list.")
 
 (defvar conf/help-modes-list
-  '(helpful-mode help-mode pydoc-mode TeX-special-mode)
+  '(helpful-mode help-mode pydoc-mode TeX-special-mode lsp-help-mode)
   "List of major-modes used in documentation buffers.")
 (defvar conf/help-modes-shackle-rules
   (mapcar
@@ -94,24 +100,118 @@
    conf/help-modes-list)
   "Shackle rules for help-modes-list.")
 
-(defvar conf/man-modes-list '(Man-mode woman-mode)
+(defvar conf/man-modes-list
+  '(Man-mode woman-mode)
   "List of major-modes used in Man-type buffers.")
 (defvar conf/man-modes-shackle-rules
   (mapcar
    (lambda (mode) `(,mode :select nil :same t)) conf/man-modes-list)
   "Shackle rules for man-modes-list.")
 
-(defvar conf/message-modes-list '(compilation-mode edebug-eval-mode)
+(defvar conf/message-modes-list
+  '(compilation-mode edebug-eval-mode)
   "List of major-modes used in message buffers.")
 (defvar conf/message-modes-shackle-rules
   (mapcar
    (lambda (mode)
-     `(,mode :select nil :popup t :align t :size 0.25))
+     `(,mode :select t :popup t))
    conf/message-modes-list)
   "Shackle rules for message-modes-list.")
 
-(use-package shackle
+(use-package popper
+  :demand t
+  :init
+  (setq popper-reference-buffers
+	      (append
+	       conf/help-modes-list
+	       conf/man-modes-list
+	       conf/repl-modes-list
+	       conf/repl-names-list
+	       conf/occur-grep-modes-list
+	       '(Custom-mode compilation-mode messages-buffer-mode)
+	       '(("^\\*Warnings\\*$" . hide)
+	         ("^\\*Compile-Log\\*$" . hide)
+	         "^\\*Backtrace\\*"
+	         "^\\*Apropos"
+	         "^Calc:"
+	         "^\\*eldoc\\(.*\\)\\*"
+	         "^\\*TeX errors\\*"
+	         "^\\*ielm\\*"
+	         "^\\*TeX Help\\*"
+	         "\\*Shell Command Output\\*"
+	         ("\\*Async Shell Command\\*" . hide)
+	         "\\*Completions\\*"
+	         "[Oo]utput\\*"
+	         "\\*EGLOT\\(.*\\)\\*"
+           "^\\*tree-sitter explorer for \\(.+\\)\\*"
+	         ("^\\*straight-process\\*" . hide)
+	         ("^\\*straight-byte-compilation\\*" . hide)
+	         ("^\\*Async-native-compile-log" . hide))))
+
+  (setq popper-display-control 'user)
   :config
+  (setq popper-display-function
+	      (defun conf/popper-select-below (buffer &optional _alist)
+	        (funcall (if (> (frame-width) 170)
+		                   #'popper-select-popup-at-bottom
+		                 #'display-buffer-at-bottom)
+		               buffer
+		               `((window-height . ,popper-window-height)
+		                 (direction . below)
+		                 (body-function . ,#'select-window)))))
+  (advice-add
+   'popper-cycle
+   :after
+   (defun conf/popper-cycle-repeated (&rest _)
+     "Continue to cycle popups with the grave key."
+     (set-transient-map
+      (let ((map (make-sparse-keymap)))
+	      (define-key map (kbd "`") #'popper-cycle)
+	      map))))
+
+  (use-package popper-echo
+    :ensure nil
+    :after popper
+    :init
+    (defun popper-message-shorten (name)
+      (cond
+       ((string-match "^\\*[hH]elpful.*?: \\(.*\\)\\*$" name)
+	      (concat (match-string 1 name) "(H)"))
+       ((string-match "^\\*Help:?\\(.*\\)\\*$" name)
+	      (concat (match-string 1 name) "(H)"))
+       ((string-match "^\\*eshell:? ?\\(.*\\)\\*$" name)
+	      (concat
+	       (match-string 1 name)
+	       (if (string-empty-p (match-string 1 name))
+	           "shell(E)"
+	         "(E)")))
+       ((string-match "^\\*\\(.*?\\)\\(?:Output\\|Command\\)\\*$" name)
+	      (concat (match-string 1 name) "(O)"))
+       ((string-match "^\\*\\(.*?\\)[ -][Ll]og\\*$" name)
+	      (concat (match-string 1 name) "(L)"))
+       ((string-match "^\\*[Cc]ompil\\(?:e\\|ation\\)\\(.*\\)\\*$" name)
+	      (concat (match-string 1 name) "(C)"))
+       (t
+	      name)))
+    (setq popper-mode-line
+	        '(:eval (propertize " POP " 'face 'mode-line-highlight)))
+    (setq
+     popper-echo-dispatch-keys '(?0 ?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8 ?9)
+     popper-echo-dispatch-actions t)
+    :config
+    (setq popper-echo-transform-function #'popper-message-shorten)
+    (advice-add
+     'popper-echo
+     :around
+     (defun conf/popper-echo-no-which-key (orig-fn)
+       (let ((which-key-show-transient-maps nil))
+	       (funcall orig-fn))))
+    (popper-echo-mode))
+  (popper-mode))
+
+(use-package shackle
+  :demand t
+  :init
   (setq shackle-select-reused-windows nil)
   (setq shackle-default-size 0.33)
   (setq shackle-default-alignment 'below)
@@ -124,6 +224,7 @@
         (append
          conf/help-modes-shackle-rules
          conf/man-modes-shackle-rules
+         conf/message-modes-shackle-rules
          conf/occur-grep-shackle-rules
          conf/repl-modes-shackle-rules
          conf/repl-names-shackle-rules
@@ -133,11 +234,6 @@
             :align right
             :size 0.4
             :regexp t)
-           (compilation-mode
-            :select nil
-            :popup t
-            :align t
-            :size 0.25)
            ("^\\*Messages\\*$"
             :select nil
             :other t
@@ -242,8 +338,7 @@
             :align right
             :size 0.4
             :regexp t))))
-
-  (shackle-mode +1))
+  (shackle-mode 1))
 
 (provide 'windows)
 ;;; windows.el ends here

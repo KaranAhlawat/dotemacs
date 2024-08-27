@@ -3,9 +3,12 @@
 ;;; General stuff that I don't think belongs to other modules but is
 ;;; too small to create it's own module
 ;;; Code:
-
 (use-package emacs
   :ensure nil
+  :no-require
+  :custom-face
+  (match ((t (:weight ,conf/weight))))
+  (link ((t (:weight ,conf/weight))))
   :init
   (setq frame-title-format "%b")
   (setq ring-bell-function 'ignore)
@@ -16,8 +19,31 @@
   (setq use-dialog-box nil)
   (setq xref-search-program 'ripgrep)
   (setq custom-theme-directory (locate-user-emacs-file "themes"))
+  (setq initial-scratch-message "Welcome to Emacs! Let's get to work")
+  (setq inhibit-startup-message t)
+  (setq auto-mode-case-fold nil)
+  (setq-default bidi-display-reordering 'left-to-right
+                bidi-paragraph-direction nil)
+  (setq bidi-inhibit-bpa nil)
+  (setq-default cursor-in-non-selected-windows nil)
+  (setq highlight-nonselected-windows nil)
+  (setq fast-but-imprecise-scrolling t)
+  (setq inhibit-compacting-font-caches t)
+  (setq redisplay-skip-fontification-on-input t)
+  (setq delete-by-moving-to-trash t)
   :config
+  (when (fboundp 'set-charset-priority)
+    (set-charset-priority 'unicode))
+  (set-default-coding-systems 'utf-8)
+  (prefer-coding-system 'utf-8)
+  (setq locale-coding-system 'utf-8)
+  (repeat-mode 1)
   (blink-cursor-mode -1))
+
+(use-package uniquify
+  :ensure nil
+  :config
+  (setq uniquify-buffer-name-style 'forward))
 
 ;; Makes it easier to see where what is
 (use-package rainbow-delimiters
@@ -28,17 +54,6 @@
 (use-package whole-line-or-region
   :config
   (whole-line-or-region-global-mode))
-
-(use-package smtpmail
-  :ensure nil
-  :config
-  (setq
-   user-full-name "Karan Ahlawat"
-   user-mail-address "ahlawatkaran12@gmail.com"
-   smtpmail-smtp-server "smtp.gmail.com"
-   smtpmail-stream-type 'starttls
-   smtpmail-smtp-serice 587
-   send-mail-function 'smtpmail-send-it))
 
 (use-package project
   :ensure nil
@@ -79,7 +94,8 @@
      "eln-cache"
      ".git"))
   :config
-	(setq popper-group-function #'popper-group-by-project)
+  (with-eval-after-load 'popper
+	  (setq popper-group-function #'popper-group-by-project))
   (setopt
    project-switch-commands
    '((project-find-file "Find file")
@@ -99,7 +115,6 @@
   (setq
    dired-recursive-copies 'always
    dired-recursive-deletes 'always
-   delete-by-moving-to-trash t
    dired-listing-switches "-aGFhlv --group-directories-first --time-style=long-iso"
    dired-dwim-target t
    dired-auto-revert-buffer #'dired-directory-changed-p
@@ -124,25 +139,13 @@
    dired-clean-confirm-killing-deleted-buffers t
    dired-x-hands-off-my-keys t))
 
-(use-package pulsar
-  :init
-  (setq pulsar-pulse t)
-  (setq pulsar-delay 0.05)
-  (setq pulsar-iterations 10)
-  (setq pulsar-face 'pulsar-blue)
-  :config
-  (add-hook 'consult-after-jump-hook #'pulsar-recenter-top)
-  (add-hook 'consult-after-jump-hook #'pulsar-reveal-entry)
-  (add-hook 'next-error-hook #'pulsar-pulse-line)
-  (pulsar-global-mode +1))
-
-(repeat-mode +1)
-
 (use-package ctrlf
+  :custom-face
+  (ctrlf-highlight-active ((t (:weight ,conf/weight))))
   :init
   (setq ctrlf-default-search-style 'fuzzy)
   :config
-  (ctrlf-mode +1))
+  (ctrlf-mode 1))
 
 (use-package nerd-icons
   :custom
@@ -157,18 +160,17 @@
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)
   (nerd-icons-completion-mode))
 
-(use-package nerd-icons-corfu
-  :after corfu
-  :config
-  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+;; (use-package nerd-icons-corfu
+;;   :after corfu
+;;   :defines (corfu-margin-formatters)
+;;   :config
+;;   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 (use-package recentf
   :ensure nil
+  :hook (elpaca-after-init . recentf-mode)
   :init
-  (setq recentf-max-saved-items 50)
-  (add-hook 'elpaca-after-init-hook (lambda ()
-                               (recentf-load-list)
-                               (recentf-mode))))
+  (setq recentf-max-saved-items 50))
 
 (use-package helpful
   :bind (("C-h f" . #'helpful-callable)

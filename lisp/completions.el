@@ -1,4 +1,4 @@
-;;; completion.el --- Completions for emacs -*- lexical-binding: t; -*-
+;; completion.el --- Completions for emacs -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; This packages sets up various completion providers
 ;;; Code:
@@ -11,7 +11,7 @@
 ;; Those quick annotations are really helpful
 (use-package marginalia
   :custom
-  (0marginalika-annotators
+  (marginalika-annotators
    '(marginalia-annotators-heavy marginalia-annotators-light nil))
   (marginalia-align 'right)
   :config
@@ -20,6 +20,7 @@
 (use-package vertico
   :ensure (vertico :files (:defaults "extensions/*.el")
                    :includes (vertico-directory))
+  :demand t
   :bind
   (:map vertico-map
         ("TAB" . #'vertico-insert)
@@ -81,6 +82,11 @@ comma."
 
 (use-package orderless
   :after vertico
+  :custom-face
+  (orderless-match-face-0 ((t (:weight ,conf/weight))))
+  (orderless-match-face-1 ((t (:weight ,conf/weight))))
+  (orderless-match-face-2 ((t (:weight ,conf/weight))))
+  (orderless-match-face-3 ((t (:weight ,conf/weight))))
   :init
   (setq completion-styles '(orderless partial-completion basic)
         completion-category-defaults nil
@@ -92,50 +98,55 @@ comma."
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file))
 
-(use-package corfu
+(use-package company
+  :ensure t
+  :demand t
+  :bind ( :map company-active-map
+          ("<tab>" . company-select-next)
+          ("<backtab>" . company-select-previous)
+          ("RET" . company-complete-selection))
+  :hook (elpaca-after-init . global-company-mode)
   :custom
-  (corfu-cycle t)
-  (corfu-auto t)
-  (corfu-auto-prefix 0)
-  (corfu-auto-delay 0)
-  (corfu-preview-current 'insert)
-  (corfu-preselct 'prompt)
-  (corfu-on-exact-match nil)
-  (corfu-quit-no-match t)
-  :bind (:map corfu-map
-              ("s-SPC" . corfu-insert-separator)
-              ("TAB" . corfu-next)
-              ([tab] . corfu-next)
-              ("S-TAB" . corfu-previous)
-              ([backtab] . corfu-previous)
-              ("RET" . corfu-insert))
-  :init
-  (global-corfu-mode)
-  (corfu-history-mode)
-  (corfu-popupinfo-mode)
+  (company-minimum-prefix-length 2)
+  (company-idle-delay 0.3)
+  (company-selection-wrap-around t)
+  (company-tooltip-align-annotations t)
+  (company-tooltip-offset-display 'lines)
+  (company-tooltip-flip-when-above nil)
+  (company-format-margin-function #'company-text-icons-margin)
+  (company-text-icons-add-background t)
+  (company-text-face-extra-attributes '(:weight bold))
+  (company-frontends '(company-pseudo-tooltip-frontend
+                       company-preview-frontend))
+  (company-backends '(company-capf
+                      company-files
+                      company-dabbrev))
+  (company-transformers '(company-sort-by-occurrence
+                          company-sort-prefer-same-case-prefix))
+  :custom-face
+  (company-tooltip-common ((t (:weight bold))))
+  (company-tooltip-search ((t (:weight ,conf/weight))))
+  (company-tooltip-selection ((t (:weight ,conf/weight))))
   :config
-  (add-hook 'eshell-mode-hook
-            (lambda ()
-              (setq-local corfu-quit-at-boundary t
-                          corfu-quit-no-match t
-                          corfu-auto nil)
-              (corfu-mode)
-              nil
-              t)))
+  (keymap-global-set "TAB" #'company-indent-or-complete-common))
 
 (use-package consult
+  :demand t
   :bind (("M-g i" . consult-imenu)
          ("C-x b" . consult-buffer)
          ("C-x 4 b" . consult-buffer-other-window)
          ("C-x 5 b" . consult-buffer-other-frame)
          ("C-x p b" . consult-project-buffer)
          ("C-x r b" . consult-bookmark)
+         ("C-c r" . consult-recent-file)
          ("M-y" . consult-yank-pop))
   :hook (completion-list-mode . consult-preview-at-point-mode)
   :init
+  (with-eval-after-load 'xref
+    (setq
+     xref-show-xrefs-function #'consult-xref
+     xref-show-definitions-function #'consult-xref))
   (setq
-   xref-show-xrefs-function #'consult-xref
-   xref-show-definitions-function #'consult-xref
    consult--tofu-char #x100000
    consult--tofu-range #xFFFE)
 
@@ -157,7 +168,6 @@ comma."
   :config
   (define-key lsp-mode-map [remap xref-find-apropos] #'consult-lsp-symbols)
   (define-key lsp-mode-map [remap lsp-treemacs-errors-lisp] #'consult-lsp-diagnostics))
-
 
 (provide 'completions)
 ;;; completions.el ends here

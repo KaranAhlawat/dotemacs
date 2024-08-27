@@ -4,20 +4,17 @@
 ;;; Code:
 
 ;; Magit, the magical git interface
-(use-package transient
-  :defer t)
+(use-package transient)
 (use-package magit
   :after transient
-  :defer t
   :custom
   (magit-display-buffer-function
    #'magit-display-buffer-same-window-except-diff-v1))
 
 (use-package lsp-mode
-  :commands (lsp lsp-deferred)
+  :defer t
   :hook (((heex-ts-mode
            elixir-ts-mode
-           scala-ts-mode
            java-ts-mode
            js-ts-mode
            tsx-ts-mode
@@ -25,6 +22,7 @@
            smithy-mode) . lsp-deferred)
          (lsp-mode . lsp-diagnostics-mode)
          (lsp-mode . lsp-enable-which-key-integration)
+         (lsp-mode . lsp-completion-mode)
          (lsp-completion-mode . conf/lsp-mode-completion-setup))
   :preface
   (defun conf/lsp-mode-completion-setup ()
@@ -32,76 +30,65 @@
 				   (assq 'global-mode-string mode-line-misc-info))
 				  " "))
   :custom
-  (lsp-completion-provider :none)
+  (lsp-completion-provider :company-capf)
   (lsp-diagnostics-provider :flycheck)
-  (lsp-headerline-breadcrumb-enable nil)
   (lsp-keep-workspace-alive t)
-  (lsp-enable-links t)
-  (lsp-enable-on-type-formatting nil)
-  (lsp-enable-text-document-color nil)
   (lsp-idle-delay 0.5)
+  (lsp-eldoc-render-all t)
+  (lsp-modeline-workspace-status-enable t)
+  (lsp-auto-execute-action nil)
+  (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
+  (lsp-log-io nil)
+  ;; core
+  (lsp-enable-xref t)
+  (lsp-auto-configure t)
+  (lsp-eldoc-enable-hover t)
+  (lsp-enable-dap-auto-configure nil)
   (lsp-enable-file-watchers nil)
   (lsp-enable-folding nil)
-  (lsp-semantic-tokens-enable nil)
-  (lsp-semantic-tokens-enable-multiline-token-support nil)
-  (lsp-eldoc-render-all t)
+  (lsp-enable-imenu t)
+  (lsp-enable-indentation nil)
+  (lsp-enable-links nil)
+  (lsp-enable-on-type-formatting nil)
+  (lsp-enable-suggest-server-download t)
+  (lsp-enable-symbol-highlighting nil)
+  (lsp-enable-text-document-color nil)
+  ;; completion
+  (lsp-completion-enable t)
+  (lsp-completion-enable-additional-text-edit nil)
+  (lsp-enable-snippet t)
+  (lsp-completion-show-kind nil)
+  (lsp-eldoc-enable-hover t)
+  (lsp-signature-render-documentation nil)
+  (lsp-signature-doc-lines 2)
+  ;; headerline
+  (lsp-headerline-breadcrumb-enable nil)
+  (lsp-headerline-breadcrumb-enable-diagnostics nil)
+  (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
+  (lsp-headerline-breadcrumb-icons-enable nil)
+  ;; modeline
   (lsp-modeline-code-actions-enable nil)
   (lsp-modeline-diagnostics-enable nil)
-  (lsp-modeline-workspace-status-enable nil)
-  (lsp-signature-doc-lines 2)
-  ;; Mine are better :)
+  ;; lens
+  (lsp-lens-enable nil)
+  ;; semantic
+  (lsp-semantic-tokens-enable nil)
+  ;; Mine are better :
   (lsp-disabled-clients '(emmet-ls eslint))
+  :init
+  (setq lsp-keymap-prefix "SPC l")
   :config
-  (use-package lsp-elixir
-    :ensure nil
-    :after lsp-mode
-    :custom
-    (lsp-elixir-server-command '("/home/karan/repos/lexical/_build/dev/package/lexical/bin/start_lexical.sh")))
-
-  (lsp-register-client
-   (make-lsp-client :new-connection (lsp-stdio-connection '("cs"
-                                                            "launch"
-                                                            "software.amazon.smithy:smithy-language-server:0.4.0"
-                                                            "--ttl"
-                                                            "1h"
-                                                            "--repository"
-                                                            "m2Local"
-                                                            "--main-class"
-                                                            "software.amazon.smithy.lsp.Main"
-                                                            "--"
-                                                            "0"))
-                    :multi-root nil
-                    :activation-fn (lsp-activate-on "smithy")
-                    :initialization-options '((statusBarProvider . "show-message")
-                                              (isHttpEnabled . t))
-                    :server-id 'smithy-ls))
-
-  (push '("\\.smithy$" . "smithy") lsp-language-id-configuration)
   (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
-
-  (use-package evil-core
-    :ensure nil
-    :after evil
-    :config
-    (evil-define-key 'normal lsp-mode-map (kbd "SPC l") lsp-command-map)
-    (add-hook 'lsp-mode-hook #'evil-normalize-keymaps))
-
   (lsp-enable-which-key-integration t))
 
-(use-package lsp-metals
-  :custom
-  (lsp-metals-server-args
-   '("-Dmetals.allow-multiline-string-formatting=on"
-     "-Dmetals.enable-best-effort=true"
-     "-Dmetals.client=emacs"))
-  (lsp-metals-fallback-scala-version "3.3.3")
-  (lsp-metals-enable-indent-on-paste t)
-  (lsp-metals-enable-semantic-highlighting nil))
+(use-package lsp-biome
+  :after lsp-mode
+  :ensure (:fetcher github :repo "cxa/lsp-biome"))
 
 ;; Eldoc for documentation
 (use-package eldoc
   :ensure nil
-  :hook lsp-mode
+  :hook ((lsp-mode emacs-lisp-mode) . eldoc-mode)
   :custom
   (eldoc-echo-area-use-multiline-p 1)
   (eldoc-echo-area-display-truncation-message t)
@@ -111,11 +98,9 @@
 
 (use-package eldoc-box
   :after eldoc
-  :hook (eldoc-mode . eldoc-box-hover-mode)
   :custom
   (eldoc-box-only-multi-line t)
-  (eldoc-box-clear-with-C-g t)
-  (eldoc-box-max-pixel-width 500))
+  (eldoc-box-clear-with-C-g t))
 
 (use-package smartparens
   :demand t
@@ -140,11 +125,11 @@
 (use-package flycheck
   :hook ((prog-mode . flycheck-mode)
          (flycheck-error-list-mode . visual-line-mode))
-  :bind
-  (:map
-   flycheck-mode-map
-   ("M-g d" . #'flycheck-list-errors))
+  :bind ( :map
+          flycheck-mode-map
+          ("M-g d" . #'flycheck-list-errors))
   :custom
+  (flycheck-emacs-lisp-load-path  'inherit)
   (flycheck-javascript-eslint-executable "eslint_d"))
 
 (use-package flycheck-deno
@@ -209,13 +194,20 @@
   :ensure nil
   :hook (prog-mode . which-function-mode))
 
-(use-package opam-switch-mode)
-
 (use-package emmet-mode
   :hook ((js-base-mode typescript-ts-base-mode) . emmet-mode))
 
+(use-package opam-switch-mode)
+
 (use-package editorconfig
   :hook (prog-mode . editorconfig-mode))
+
+(use-package compile
+  :ensure nil
+  :custom
+  (compilation-filter-hook '(ansi-color-compilation-filter
+                             ansi-osc-compilation-filter))
+  (compilation-scroll-output t))
 
 (provide 'development)
 ;;; development.el ends here

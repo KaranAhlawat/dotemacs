@@ -31,12 +31,11 @@
 (dolist (mode '(org-mode-hook eshell-mode-hook))
   (add-hook mode #'conf/disable-line-numbers-in-mode))
 
-;; Switch off the visible bell, it's distracting to me. As well as the
-;; blinking cursor
-(setq visible-bell nil)
-(blink-cursor-mode -1)
+(defvar conf/weight 'medium
+  "Weight used for faces throughout config.")
 
 (use-package fontaine
+  :demand t
   :bind ("C-c f" . #'fontaine-set-preset)
   :init
   (setq x-underline-at-descent-line t)
@@ -44,41 +43,28 @@
   (setq fontaine-latest-state-file (locate-user-emacs-file
                                     "fontaine-latest-state.eld"))
   (setq fontaine-presets
-        '((small
-           :default-height 80)
-          (regular)
-          (monitor
-           :default-height 140
-           :fixed-pitch-height 140
-           :variable-pitch-height 160)
-          (fira
-           :default-family "Fira Code")
-          (large
-           :inherit regular
-           :default-height 160)
-          (presentation
-           :inherit regular
-           :default-height 190)
+        '((regular)
           (t
-           :default-family "monospace"
-           :default-weight regular
-           :default-height 120
+           :default-family "IBM Plex Mono"
+           :default-weight medium
+           :default-height 130
            :bold-family nil
            :bold-weight bold
            :italic-family nil
            :italic-slant italic
            :line-spacing nil
-           :fixed-pitch-family "monospace"
-           :fixed-pitch-weight nil
+           :fixed-pitch-family "IBM Plex Mono"
+           :fixed-pitch-weight medium
            :fixed-pitch-height 1.0
            :fixed-pitch-serif-family nil
+           :fixed-pitch-serif-weight medium
+           :fixed-pitch-serif-height 1.0
            :variable-pitch-family "serif"
            :variable-pitch-height 130
            :variable-pitch-weight regular)))
   :config
   (fontaine-set-preset 'regular)
-  (set-fontset-font t 'emoji "Segoue UI Emoji")
-  (add-hook 'kill-emacs-hook #'fontaine-store-latest-preset))
+  (fontaine-mode))
 
 (use-package doom-themes
   :custom
@@ -93,7 +79,7 @@
   (doom-themes-set-faces nil
     '(tooltip :inherit 'fixed-pitch)
     '(font-lock-comment-face :inherit 'italic))
-  (load-theme 'doom-one t))
+  (load-theme 'doom-miramare t))
 
 ;; Cuz I may have the memory of a fish
 (use-package which-key
@@ -105,11 +91,19 @@
 
 ;; A more minimal modeline. Maybe someday I'll actually customize the defualt in-built one.
 (use-package doom-modeline
+  :demand t
+  :custom-face
+  (doom-modeline-buffer-file ((t (:weight ,conf/weight))))
+  (doom-modeline-buffer-path ((t (:weight ,conf/weight))))
   :init
   (setq doom-modeline-icon nil)
   :config
   (column-number-mode)
   (doom-modeline-mode))
+
+(use-package hide-mode-line
+  :demand t
+  :hook (completion-list-mode . hide-mode-line-mode))
 
 (provide 'ui)
 ;;; ui.el ends here

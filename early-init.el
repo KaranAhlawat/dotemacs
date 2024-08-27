@@ -2,11 +2,12 @@
 ;;; Commentary:
 ;;; Early init file
 ;;; Code:
-(setq gc-cons-threshold (* 50 1000 1000))
-
-;; Load the latest version of a file in `load', if an extension is not
-;; specified.
-(setq load-prefer-newer t)
+(setq gc-cons-threshold most-positive-fixnum)
+(run-with-idle-timer
+ 5 nil
+ (lambda ()
+   (setq-default gc-cons-threshold (* 2000 1024 1024))
+   (message "gc-cons-threshold restored to %S" gc-cons-threshold)))
 
 ;; Customize native compilation
 (setq byte-compile-warnings '(not obsolete))
@@ -15,6 +16,17 @@
 (setq inhibit-automatic-native-compilation t)
 (add-to-list
  'native-comp-eln-load-path (locate-user-emacs-file "eln-cache/"))
+
+;; Load the latest version of a file in `load', if an extension is not
+;; specified.
+(setq load-prefer-newer t)
+
+;; Setting the custom file
+(setq custom-file (locate-user-emacs-file "custom.el"))
+(add-hook 'elpaca-after-init-hook
+          (lambda ()
+            (when (file-exists-p custom-file)
+	            (load custom-file nil 'nomessage))))
 
 ;; Shut down package.el in favor of straight.el While package.el is
 ;; built-in, and is now quite advanced, I am still not very
@@ -37,7 +49,7 @@
  '((vertical-scroll-bars . nil)
 	 (horizontal-scroll-bars . nil)
 	 (fullscreen . maximized)
-	 (undecorated . t)
+	 (undecorated . nil)
 	 (menu-bar-lines . 0)
 	 (tool-bar-lines . 0)
 	 (alpha . 100)
@@ -49,6 +61,8 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+(blink-cursor-mode -1)
+(setq visible-bell nil)
 (setq inhibit-splash-screen t)
 (setq use-dialog-box t)
 (setq use-file-dialog nil)

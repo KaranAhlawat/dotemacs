@@ -22,6 +22,11 @@
 
 ;; ORG CONFIGURATION
 (use-package org
+  :defer t
+  :defines (org-agenda-tags-column
+            org-agenda-block-separator
+            org-agenda-time-grid
+            org-agenda-current-time-string)
   :hook
   ((org-mode . visual-line-mode)
    (org-mode . turn-on-org-cdlatex)

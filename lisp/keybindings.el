@@ -2,7 +2,6 @@
 ;;; Commentary:
 ;;; Keybindings I had setup but forgot to add to yadm lmao
 ;;; Code:
-
 (use-package evil
   :demand t
   :bind (( "<escape>" . keyboard-escape-quit )
@@ -15,6 +14,7 @@
          ( "?" . ctrlf-backward-literal )
          ( "*"  . ctrlf-forward-symbol-at-point )
          ( "C-n" . evil-ex-nohighlight )
+         ( "C-b" . evil-scroll-up )
          :map evil-visual-state-map
          ( "/" . ctrlf-forward-literal )
          ( "?" . ctrlf-backward-literal )
@@ -25,7 +25,7 @@
   (setq evil-want-keybinding nil)
   (setq evil-want-Y-yank-to-eol t)
   (setq evil-search-module 'evil-search)
-  (setq evil-want-C-u-scroll t)
+  (setq evil-want-C-u-scroll nil)
   (setq evil-want-C-d-scroll t)
   (setq evil-split-window-below t)
   (setq evil-vsplit-window-right t)
@@ -82,18 +82,30 @@
     "qe" #'kill-emacs
     "qq" #'delete-frame
     "pp" #'project-switch-project
-    "pb" #'project-switch-to-buffer
+    "pb" #'consult-project-buffer
     "pk" #'project-kill-buffers
     "pf" #'project-find-file
+    "pc" #'project-compile
+    "pe" #'project-eshell
     "pg" #'consult-ripgrep
     "af" #'apheleia-format-buffer
     "hv" #'helpful-variable
     "hf" #'helpful-callable
     "hk" #'helpful-key
     "hi" #'info
+    "hp" #'eldoc-box-help-at-point
     "gi" #'consult-imenu
     "xe" #'eval-last-sexp
     "xp" #'pp-eval-last-sexp)
+  (with-eval-after-load 'lsp-mode
+    (evil-leader/set-key
+      "l" lsp-command-map))
+  (with-eval-after-load 'popper
+    (evil-leader/set-key
+      "``" #'popper-toggle
+      "`q" #'popper-kill-latest-popup
+      "`t" #'popper-toggle-type
+      "`c" #'popper-cycle))
   (global-evil-leader-mode))
 
 (use-package evil-cleverparens

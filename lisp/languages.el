@@ -123,6 +123,10 @@
   :after tuareg
   :mode "\\.ml\\'")
 
+(use-package lisp-extra-font-lock
+  :ensure t
+  :hook (emacs-lisp-mode . lisp-extra-font-lock-mode))
+
 (use-package smithy-mode)
 
 (provide 'languages)

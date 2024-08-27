@@ -18,6 +18,12 @@
 
 (use-package eshell
   :ensure nil
+  :demand t
+  :defines (eshell-hist-ignoredups
+            eshell-history-size
+            eshell-scroll-to-bottom-on-input
+            eshell-scroll-to-bottom-on-output
+            eshell-aliases-file)
   :hook
   ((eshell-mode . conf/eshell-setup-modes)
    (eshell-first-time-mode . conf/eshell-first-load-settings)
@@ -32,9 +38,7 @@
      eshell-hist-ignoredups t
      eshell-history-size nil
      eshell-scroll-to-bottom-on-input t
-     eshell-scroll-to-bottom-on-output t
-     eshell-glob-case-insensitive t
-     eshell-error-if-no-glob t)
+     eshell-scroll-to-bottom-on-output t)
     (if (and (file-readable-p eshell-aliases-file))
         (eshell-read-aliases-list)
       (progn
@@ -47,21 +51,11 @@
 ;; Eshell appearance
 (use-package eshell
   :ensure nil
-  :config
-  (setq
-   eshell-prompt-regexp "^.* λ "
-   eshell-prompt-function #'conf/eshell-default-prompt-fn)
-
-  ;; From the Doom emacs config
-  (setq eshell-banner-message
-        '(format "%s %s\n"
-                 (propertize (format " %s "
-                                     (string-trim (buffer-name)))
-                             'face 'mode-line-highlight)
-                 (propertize (current-time-string)
-                             'face
-                             'font-lock-keyword-face)))
-
+  :demand t
+  :defines (eshell-prompt-regexp
+            eshell-prompt-function
+            eshell-banner-message)
+  :preface
   (defun conf/eshell-default-prompt-fn ()
     "Generate the prompt string for eshell. Use for `eshell-prompt-function'."
     (concat
@@ -86,7 +80,6 @@
                      'success
                    'error))
      " "))
-
   (defsubst conf/eshell--current-git-branch ()
     ;; TODO Refactor me
     (cl-destructuring-bind
@@ -114,6 +107,20 @@
       (if (equal status 0)
           (format " [%s]" output)
         "")))
+  :config
+  (setq
+   eshell-prompt-regexp "^.* λ "
+   eshell-prompt-function #'conf/eshell-default-prompt-fn)
+
+  ;; From the Doom emacs config
+  (setq eshell-banner-message
+        '(format "%s %s\n"
+                 (propertize (format " %s "
+                                     (string-trim (buffer-name)))
+                             'face 'mode-line-highlight)
+                 (propertize (current-time-string)
+                             'face
+                             'font-lock-keyword-face)))
 
   (defface conf/eshell-prompt-pwd
     '((t (:inherit font-lock-keyword-face)))
@@ -125,13 +132,10 @@
     "TODO"
     :group 'eshell))
 
-
-
 (use-package shell
   :ensure nil
   :hook
-  (;; (shell-mode . (lambda () (corfu-mode -1)))
-   (shell-mode . (lambda () (display-line-numbers-mode -1)))
+  ((shell-mode . (lambda () (display-line-numbers-mode -1)))
    (shell-mode . (lambda ()
                    (font-lock-mode -1)
                    (make-local-variable 'font-lock-function)

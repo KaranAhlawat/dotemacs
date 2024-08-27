@@ -9,8 +9,10 @@
   (setq auto-save-file-name-transforms
         `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
 
-(require 'autorevert)
-(setq global-auto-revert-non-file-buffers t)
+(use-package autorevert
+  :ensure nil
+  :config
+  (setq global-auto-revert-non-file-buffers t))
 
 ;; Measure the startup time of  emacs
 (defun conf/display-startup-time ()
@@ -30,7 +32,7 @@
 (setq-default cursor-type 'bar)
 (setq-default tab-always-indent 'complete)
 (setq-default tab-first-completion 'eol)
-(setq-default read-process-output-max (* 1024 1024)) ;; 1 MB
+(setq-default read-process-output-max (* 16 1024 1024)) ;; 1 MB
 
 ;; Shorten yes or no to y or n
 (setq use-short-answers t)
@@ -60,6 +62,7 @@
 
 (use-package delsel
   :ensure nil
+  :demand t
   :config
   (delete-selection-mode))
 
