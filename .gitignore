@@ -22,3 +22,4 @@ fontaine-latest-state.eld
 elpaca
 .lsp-session*
 .dap-*
+*.elc
