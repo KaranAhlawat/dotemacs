@@ -19,6 +19,7 @@
            js-ts-mode
            tsx-ts-mode
            typescript-ts-mode
+           scala-ts-mode
            smithy-mode) . lsp-deferred)
          (lsp-mode . lsp-diagnostics-mode)
          (lsp-mode . lsp-enable-which-key-integration)
@@ -80,6 +81,15 @@
   :config
   (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
   (lsp-enable-which-key-integration t))
+
+(use-package lsp-metals
+  :after lsp-mode
+  :ensure t
+  :custom
+  (lsp-metals-server-args '("-Dmetals.allow-multiline-string-formatting=on"
+                            "-Dmetals.enable-best-effort=true"
+                            "-Dmetals.client=emacs"))
+  (lsp-metals-enable-indent-on-paste t))
 
 (use-package lsp-biome
   :after lsp-mode

@@ -47,7 +47,7 @@
           (t
            :default-family "IBM Plex Mono"
            :default-weight medium
-           :default-height 130
+           :default-height 120
            :bold-family nil
            :bold-weight bold
            :italic-family nil
