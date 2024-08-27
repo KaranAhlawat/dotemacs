@@ -47,7 +47,7 @@
           (t
            :default-family "IBM Plex Mono"
            :default-weight medium
-           :default-height 120
+           :default-height 110
            :bold-family nil
            :bold-weight bold
            :italic-family nil
@@ -79,7 +79,7 @@
   (doom-themes-set-faces nil
     '(tooltip :inherit 'fixed-pitch)
     '(font-lock-comment-face :inherit 'italic))
-  (load-theme 'doom-miramare t))
+  (load-theme 'doom-gruvbox t))
 
 ;; Cuz I may have the memory of a fish
 (use-package which-key

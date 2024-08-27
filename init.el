@@ -45,8 +45,6 @@
     (elpaca-generate-autoloads "elpaca" repo)
     (load "./elpaca-autoloads")))
 (add-hook 'after-init-hook #'elpaca-process-queues)
-
-(require 'elpaca)
 (elpaca `(,@elpaca-order))
 
 ;; Add ~/.config/emacs/lisp to the load-path
