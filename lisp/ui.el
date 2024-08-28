@@ -31,7 +31,7 @@
 (dolist (mode '(org-mode-hook eshell-mode-hook))
   (add-hook mode #'conf/disable-line-numbers-in-mode))
 
-(defvar conf/weight 'medium
+(defvar conf/weight 'regular
   "Weight used for faces throughout config.")
 
 (use-package fontaine
@@ -45,19 +45,19 @@
   (setq fontaine-presets
         '((regular)
           (t
-           :default-family "IBM Plex Mono"
-           :default-weight medium
+           :default-family "Monego"
+           :default-weight regular
            :default-height 110
            :bold-family nil
            :bold-weight bold
            :italic-family nil
            :italic-slant italic
            :line-spacing nil
-           :fixed-pitch-family "IBM Plex Mono"
-           :fixed-pitch-weight medium
+           :fixed-pitch-family "Monego"
+           :fixed-pitch-weight regular
            :fixed-pitch-height 1.0
            :fixed-pitch-serif-family nil
-           :fixed-pitch-serif-weight medium
+           :fixed-pitch-serif-weight regular
            :fixed-pitch-serif-height 1.0
            :variable-pitch-family "serif"
            :variable-pitch-height 130
@@ -68,9 +68,8 @@
 
 (use-package doom-themes
   :custom
-  (doom-themes-enable-bold nil)
-  (doom-oksolar-dark-brighter-comments t)
-  (doom-oksolar-light-brighter-comments t)
+  (doom-themes-enable-bold t)
+  (doom-xcode-padded-modeline t)
 
   :config
   (with-eval-after-load 'org
@@ -79,7 +78,7 @@
   (doom-themes-set-faces nil
     '(tooltip :inherit 'fixed-pitch)
     '(font-lock-comment-face :inherit 'italic))
-  (load-theme 'doom-gruvbox t))
+  (load-theme 'doom-xcode t))
 
 ;; Cuz I may have the memory of a fish
 (use-package which-key

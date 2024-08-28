@@ -53,7 +53,7 @@
   (lsp-enable-on-type-formatting nil)
   (lsp-enable-suggest-server-download t)
   (lsp-enable-symbol-highlighting nil)
-  (lsp-enable-text-document-color nil)
+  (lsp-enable-text-document-color t)
   ;; completion
   (lsp-completion-enable t)
   (lsp-completion-enable-additional-text-edit nil)

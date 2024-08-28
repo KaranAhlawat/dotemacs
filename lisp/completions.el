@@ -142,10 +142,6 @@ comma."
          ("M-y" . consult-yank-pop))
   :hook (completion-list-mode . consult-preview-at-point-mode)
   :init
-  (with-eval-after-load 'xref
-    (setq
-     xref-show-xrefs-function #'consult-xref
-     xref-show-definitions-function #'consult-xref))
   (setq
    consult--tofu-char #x100000
    consult--tofu-range #xFFFE)
