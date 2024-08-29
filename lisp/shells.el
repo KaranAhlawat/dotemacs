@@ -19,11 +19,6 @@
 (use-package eshell
   :ensure nil
   :demand t
-  :defines (eshell-hist-ignoredups
-            eshell-history-size
-            eshell-scroll-to-bottom-on-input
-            eshell-scroll-to-bottom-on-output
-            eshell-aliases-file)
   :hook
   ((eshell-mode . conf/eshell-setup-modes)
    (eshell-first-time-mode . conf/eshell-first-load-settings)

@@ -87,7 +87,7 @@
     "pf" #'project-find-file
     "pc" #'project-compile
     "pe" #'project-eshell
-    "pg" #'consult-ripgrep
+    "pg" #'project-find-regexp
     "af" #'apheleia-format-buffer
     "hv" #'helpful-variable
     "hf" #'helpful-callable

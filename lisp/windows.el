@@ -9,11 +9,6 @@
 
 (use-package beframe
   :demand t
-  :defines (beframe-global-buffers
-            beframe-functions-in-frames
-            beframe-create-frame-scratch-buffer
-            beframe-kill-frame-scratch-buffer
-            beframe-rename-function)
   :init
   (setq beframe-global-buffers
         '("*Messages*" "*Org Agenda*" "*scratch*"))
