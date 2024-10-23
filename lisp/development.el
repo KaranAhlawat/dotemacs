@@ -11,17 +11,29 @@
   (magit-display-buffer-function
    #'magit-display-buffer-same-window-except-diff-v1))
 
+;; ((heex-ts-mode
+;;            elixir-ts-mode
+;;            java-ts-mode
+;;            js-ts-mode
+;;            tsx-ts-mode
+;;            scala-ts-mode
+;;            typescript-ts-mode
+;;            smithy-mode) . lsp-deferred)
+
+(use-package lsp-bridge
+  :ensure '( lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
+             :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+             :build (:not compile))
+  :custom
+  (acm-enable-tabnine nil)
+  (acm-enable-icon nil)
+  (acm-enable-search-file-words nil)
+  :custom
+  (global-lsp-bridge-mode))
+
 (use-package lsp-mode
   :defer t
-  :hook (((heex-ts-mode
-           elixir-ts-mode
-           java-ts-mode
-           js-ts-mode
-           tsx-ts-mode
-           typescript-ts-mode
-           scala-ts-mode
-           smithy-mode) . lsp-deferred)
-         (lsp-mode . lsp-diagnostics-mode)
+  :hook ((lsp-mode . lsp-diagnostics-mode)
          (lsp-mode . lsp-enable-which-key-integration)
          (lsp-mode . lsp-completion-mode)
          (lsp-completion-mode . conf/lsp-mode-completion-setup))
@@ -30,6 +42,28 @@
     (setf (caadr ;; Pad before lsp modeline error info
 				   (assq 'global-mode-string mode-line-misc-info))
 				  " "))
+  (defun lsp-booster--advice-json-parse (old-fn &rest args)
+    "Try to parse bytecode instead of json."
+    (or
+     (when (equal (following-char) ?#)
+       (let ((bytecode (read (current-buffer))))
+         (when (byte-code-function-p bytecode)
+           (funcall bytecode))))
+     (apply old-fn args)))
+  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+    "Prepend emacs-lsp-booster command to lsp CMD."
+    (let ((orig-result (funcall old-fn cmd test?)))
+      (if (and (not test?)                             ;; for check lsp-server-present?
+               (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+               lsp-use-plists
+               (not (functionp 'json-rpc-connection))  ;; native json-rpc
+               (executable-find "emacs-lsp-booster"))
+          (progn
+            (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+              (setcar orig-result command-from-exec-path))
+            (message "Using emacs-lsp-booster for %s!" orig-result)
+            (cons "emacs-lsp-booster" orig-result))
+        orig-result)))
   :custom
   (lsp-completion-provider :company-capf)
   (lsp-diagnostics-provider :flycheck)
@@ -56,7 +90,7 @@
   (lsp-enable-text-document-color t)
   ;; completion
   (lsp-completion-enable t)
-  (lsp-completion-enable-additional-text-edit nil)
+  (lsp-completion-enable-additional-text-edit t)
   (lsp-enable-snippet t)
   (lsp-completion-show-kind nil)
   (lsp-eldoc-enable-hover t)
@@ -80,20 +114,23 @@
   (setq lsp-keymap-prefix "SPC l")
   :config
   (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
+  (advice-add (if (progn (require 'json)
+                         (fboundp 'json-parse-buffer))
+                  'json-parse-buffer
+                'json-read)
+              :around
+              #'lsp-booster--advice-json-parse)
+  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
   (lsp-enable-which-key-integration t))
 
 (use-package lsp-metals
   :after lsp-mode
   :ensure t
   :custom
-  (lsp-metals-server-args '("-Dmetals.allow-multiline-string-formatting=on"
+  (lsp-metals-server-args '("-Dmetals.allow-multiline-string-formatting=off"
                             "-Dmetals.enable-best-effort=true"
                             "-Dmetals.client=emacs"))
   (lsp-metals-enable-indent-on-paste t))
-
-(use-package lsp-biome
-  :after lsp-mode
-  :ensure (:fetcher github :repo "cxa/lsp-biome"))
 
 ;; Eldoc for documentation
 (use-package eldoc
@@ -137,10 +174,26 @@
          (flycheck-error-list-mode . visual-line-mode))
   :bind ( :map
           flycheck-mode-map
-          ("M-g d" . #'flycheck-list-errors))
+          ("M-g d" . #'flycheck-list-errors)
+          :map
+          evil-normal-state-map
+          ("]d" . #'next-error)
+          ("[d" . #'previous-error))
+  :preface
+  (defvar-local conf/flycheck-local-cache nil)
+  (defun conf/flycheck-checker-get (fn checker property)
+    (or (alist-get property (alist-get checker conf/flycheck-local-cache))
+        (funcall fn checker property)))
   :custom
   (flycheck-emacs-lisp-load-path  'inherit)
-  (flycheck-javascript-eslint-executable "eslint_d"))
+  (flycheck-javascript-eslint-executable "eslint_d")
+  :config
+  (advice-add 'flycheck-checker-get :around 'conf/flycheck-checker-get)
+
+  (add-hook 'lsp-managed-mode-hook
+            (lambda ()
+              (cond ((derived-mode-p 'typescript-ts-base-mode)
+                     (setq conf/flycheck-local-cache '((lsp . ((next-checkers . (javascript-biome)))))))))))
 
 (use-package flycheck-deno
   :config
@@ -152,6 +205,9 @@
   :config
   (flycheck-kotlin-setup)
   (flycheck-add-next-checker 'lsp 'kotlin-ktlint))
+
+(use-package flycheck-biomejs
+  :ensure (:host github :repo "craneduck/flycheck-biomejs"))
 
 (use-package eslintd-fix
   :hook ((js-ts-mode . eslintd-fix-mode)
@@ -173,23 +229,17 @@
                          (when-let* ((project (project-current))
                                      (root (project-root project)))
                            (list "--config" (expand-file-name ".scalafmt.conf" root)))
-                         "--stdin")))
+                         "--stdin"))
+            (biome . (npx "biome" "format" "--stdin-file-path" filepath)))
     (push it apheleia-formatters))
 
   (--each '((clojure-mode . zprint)
             (clojurescript-mode . zprint)
             (clojurec-mode . zprint)
+            (typescript-ts-mode . biome)
+            (tsx-ts-mode . biome)
             (scala-ts-mode . scalafmt))
     (push it apheleia-mode-alist)))
-
-(use-package aggressive-indent
-  :hook (emacs-lisp-mode . aggressive-indent-mode))
-
-;; ANSI color in compilation buffer
-(use-package ansi-color
-  :ensure nil
-  :config
-  (add-hook 'compilation-filter-hook #'ansi-color-compilation-filter))
 
 (use-package tramp
   :ensure nil
@@ -198,7 +248,7 @@
   :config
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
   (add-to-list 'tramp-connection-properties
-               (list nil "remote-shell" "/bin/bash")))
+               (list nil remote-shell "/bin/bash")))
 
 (use-package which-func
   :ensure nil

@@ -20,7 +20,7 @@
             (yaml . ("https://github.com/ikatyang/tree-sitter-yaml"))
             (java . ("https://github.com/tree-sitter/tree-sitter-java"))
             (kotlin . ("https://github.com/fwcd/tree-sitter-kotlin"))
-            (scala . ("https://github.com/tree-sitter/tree-sitter-scala" "v0.20.2"))
+            (scala . ("https://github.com/tree-sitter/tree-sitter-scala"))
             (ocaml . ("https://github.com/tree-sitter/tree-sitter-ocaml" "v0.21.2" "grammars/ocaml/src"))
             (ocaml-interface . ("https://github.com/tree-sitter/tree-sitter-ocaml" "v0.21.2" "grammars/interface/src"))
             (php . ("https://github.com/tree-sitter/tree-sitter-php" nil "php/src"))

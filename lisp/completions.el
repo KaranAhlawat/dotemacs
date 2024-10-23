@@ -105,7 +105,7 @@ comma."
           ("<tab>" . company-select-next)
           ("<backtab>" . company-select-previous)
           ("RET" . company-complete-selection))
-  :hook (elpaca-after-init . global-company-mode)
+  ;; :hook (elpaca-after-init . global-company-mode)
   :custom
   (company-minimum-prefix-length 2)
   (company-idle-delay 0.3)

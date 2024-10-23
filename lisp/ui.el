@@ -9,10 +9,6 @@
 
 (add-to-list 'custom-theme-load-path "~/.config/emacs/themes")
 
-;; Relative numbers to move around quicker
-(setq display-line-numbers-type 'relative)
-(global-display-line-numbers-mode)
-
 ;; Hide the line numbering in certain modes as well
 (defun conf/disable-line-numbers-in-mode ()
   "Disable `display-line-numbers-mode' in a major-mode."
@@ -31,7 +27,7 @@
 (dolist (mode '(org-mode-hook eshell-mode-hook))
   (add-hook mode #'conf/disable-line-numbers-in-mode))
 
-(defvar conf/weight 'regular
+(defvar conf/weight 'medium
   "Weight used for faces throughout config.")
 
 (use-package fontaine
@@ -43,18 +39,18 @@
   (setq fontaine-latest-state-file (locate-user-emacs-file
                                     "fontaine-latest-state.eld"))
   (setq fontaine-presets
-        '((regular)
+        `((regular)
           (t
-           :default-family "Monego"
-           :default-weight regular
-           :default-height 110
+           :default-family "monospace"
+           :default-weight ,conf/weight
+           :default-height 120
            :bold-family nil
            :bold-weight bold
            :italic-family nil
            :italic-slant italic
            :line-spacing nil
-           :fixed-pitch-family "Monego"
-           :fixed-pitch-weight regular
+           :fixed-pitch-family "monospace"
+           :fixed-pitch-weight ,conf/weight
            :fixed-pitch-height 1.0
            :fixed-pitch-serif-family nil
            :fixed-pitch-serif-weight regular
@@ -78,7 +74,7 @@
   (doom-themes-set-faces nil
     '(tooltip :inherit 'fixed-pitch)
     '(font-lock-comment-face :inherit 'italic))
-  (load-theme 'doom-xcode t))
+  (load-theme 'sonokai t))
 
 ;; Cuz I may have the memory of a fish
 (use-package which-key
