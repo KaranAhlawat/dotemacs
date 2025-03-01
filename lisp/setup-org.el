@@ -23,6 +23,7 @@
 ;; ORG CONFIGURATION
 (use-package org
   :defer t
+  :ensure nil
   :hook
   ((org-mode . visual-line-mode)
    (org-mode . turn-on-org-cdlatex)

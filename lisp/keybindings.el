@@ -2,6 +2,56 @@
 ;;; Commentary:
 ;;; Keybindings I had setup but forgot to add to yadm lmao
 ;;; Code:
+
+(use-package evil-leader
+  :demand t
+  :config
+  (evil-leader/set-leader "<SPC>")
+  (evil-leader/set-key
+    "<SPC>" #'execute-extended-command
+    "b" #'consult-buffer
+    "s" #'save-buffer
+    "k" #'kill-buffer
+    "f" #'find-file
+    "r" #'consult-recent-file
+    "w" evil-window-map
+    "qe" #'kill-emacs
+    "qq" #'delete-frame
+    "pp" #'project-switch-project
+    "pb" #'consult-project-buffer
+    "pk" #'project-kill-buffers
+    "pf" #'project-find-file
+    "pc" #'project-compile
+    "pe" #'project-eshell
+    "pg" #'project-find-regexp
+    "af" #'apheleia-format-buffer
+    "hv" #'helpful-variable
+    "hf" #'helpful-callable
+    "hk" #'helpful-key
+    "hi" #'info
+    "hp" #'eldoc-box-help-at-point
+    "gi" #'consult-imenu
+    "xe" #'eval-last-sexp
+    "xp" #'pp-eval-last-sexp)
+  (with-eval-after-load 'lsp-bridge
+    (evil-leader/set-key
+      "lf" #'lsp-bridge-code-format
+      "lh" #'lsp-bridge-popup-documentation
+      "la" #'lsp-bridge-code-action
+      "lr" #'lsp-bridge-rename
+      "ld" #'lsp-bridge-find-def
+      "lg" #'lsp-bridge-find-references
+      "ll" #'lsp-bridge-diagnostic-list
+      "ln" #'lsp-bridge-diagnostic-jump-next
+      "lp" #'lsp-bridge-diagnostic-jump-prev))
+  (with-eval-after-load 'popper
+    (evil-leader/set-key
+      "``" #'popper-toggle
+      "`q" #'popper-kill-latest-popup
+      "`t" #'popper-toggle-type
+      "`c" #'popper-cycle))
+  (global-evil-leader-mode))
+
 (use-package evil
   :demand t
   :bind (( "<escape>" . keyboard-escape-quit )
@@ -38,6 +88,7 @@
   (setq evil-default-cursor 't)
   (setq evil-insert-state-cursor 't)
   :config
+  (evil-set-initial-state 'lsp-bridge-ref-mode 'emacs)
   (evil-mode t))
 
 (use-package evil-collection
@@ -66,47 +117,6 @@
 (use-package evil-surround
   :config
   (global-evil-surround-mode))
-
-(use-package evil-leader
-  :after evil
-  :config
-  (evil-leader/set-leader "<SPC>")
-  (evil-leader/set-key
-    "<SPC>" #'execute-extended-command
-    "b" #'consult-buffer
-    "s" #'save-buffer
-    "k" #'kill-buffer
-    "f" #'find-file
-    "r" #'consult-recent-file
-    "w" evil-window-map
-    "qe" #'kill-emacs
-    "qq" #'delete-frame
-    "pp" #'project-switch-project
-    "pb" #'consult-project-buffer
-    "pk" #'project-kill-buffers
-    "pf" #'project-find-file
-    "pc" #'project-compile
-    "pe" #'project-eshell
-    "pg" #'project-find-regexp
-    "af" #'apheleia-format-buffer
-    "hv" #'helpful-variable
-    "hf" #'helpful-callable
-    "hk" #'helpful-key
-    "hi" #'info
-    "hp" #'eldoc-box-help-at-point
-    "gi" #'consult-imenu
-    "xe" #'eval-last-sexp
-    "xp" #'pp-eval-last-sexp)
-  (with-eval-after-load 'lsp-mode
-    (evil-leader/set-key
-      "l" lsp-command-map))
-  (with-eval-after-load 'popper
-    (evil-leader/set-key
-      "``" #'popper-toggle
-      "`q" #'popper-kill-latest-popup
-      "`t" #'popper-toggle-type
-      "`c" #'popper-cycle))
-  (global-evil-leader-mode))
 
 (use-package evil-cleverparens
   :after (evil smartparens)

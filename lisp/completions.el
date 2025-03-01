@@ -159,11 +159,5 @@ comma."
   :after consult
   :bind ("M-g f" . consult-flycheck))
 
-(use-package consult-lsp
-  :after consult
-  :config
-  (define-key lsp-mode-map [remap xref-find-apropos] #'consult-lsp-symbols)
-  (define-key lsp-mode-map [remap lsp-treemacs-errors-lisp] #'consult-lsp-diagnostics))
-
 (provide 'completions)
 ;;; completions.el ends here

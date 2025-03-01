@@ -4,138 +4,46 @@
 ;;; Code:
 
 ;; Magit, the magical git interface
+;; (use-package compat)
+(use-package with-editor)
 (use-package transient)
 (use-package magit
-  :after transient
+  :after compat
   :custom
   (magit-display-buffer-function
    #'magit-display-buffer-same-window-except-diff-v1))
-
-;; ((heex-ts-mode
-;;            elixir-ts-mode
-;;            java-ts-mode
-;;            js-ts-mode
-;;            tsx-ts-mode
-;;            scala-ts-mode
-;;            typescript-ts-mode
-;;            smithy-mode) . lsp-deferred)
 
 (use-package lsp-bridge
   :ensure '( lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
              :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
              :build (:not compile))
+  :demand t
+  :bind (("M-." . lsp-bridge-find-def)
+         ("M-?" . lsp-bridge-find-references))
   :custom
   (acm-enable-tabnine nil)
   (acm-enable-icon nil)
   (acm-enable-search-file-words nil)
-  :custom
-  (global-lsp-bridge-mode))
-
-(use-package lsp-mode
-  :defer t
-  :hook ((lsp-mode . lsp-diagnostics-mode)
-         (lsp-mode . lsp-enable-which-key-integration)
-         (lsp-mode . lsp-completion-mode)
-         (lsp-completion-mode . conf/lsp-mode-completion-setup))
-  :preface
-  (defun conf/lsp-mode-completion-setup ()
-    (setf (caadr ;; Pad before lsp modeline error info
-				   (assq 'global-mode-string mode-line-misc-info))
-				  " "))
-  (defun lsp-booster--advice-json-parse (old-fn &rest args)
-    "Try to parse bytecode instead of json."
-    (or
-     (when (equal (following-char) ?#)
-       (let ((bytecode (read (current-buffer))))
-         (when (byte-code-function-p bytecode)
-           (funcall bytecode))))
-     (apply old-fn args)))
-  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
-    "Prepend emacs-lsp-booster command to lsp CMD."
-    (let ((orig-result (funcall old-fn cmd test?)))
-      (if (and (not test?)                             ;; for check lsp-server-present?
-               (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
-               lsp-use-plists
-               (not (functionp 'json-rpc-connection))  ;; native json-rpc
-               (executable-find "emacs-lsp-booster"))
-          (progn
-            (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
-              (setcar orig-result command-from-exec-path))
-            (message "Using emacs-lsp-booster for %s!" orig-result)
-            (cons "emacs-lsp-booster" orig-result))
-        orig-result)))
-  :custom
-  (lsp-completion-provider :company-capf)
-  (lsp-diagnostics-provider :flycheck)
-  (lsp-keep-workspace-alive t)
-  (lsp-idle-delay 0.5)
-  (lsp-eldoc-render-all t)
-  (lsp-modeline-workspace-status-enable t)
-  (lsp-auto-execute-action nil)
-  (lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory))
-  (lsp-log-io nil)
-  ;; core
-  (lsp-enable-xref t)
-  (lsp-auto-configure t)
-  (lsp-eldoc-enable-hover t)
-  (lsp-enable-dap-auto-configure nil)
-  (lsp-enable-file-watchers nil)
-  (lsp-enable-folding nil)
-  (lsp-enable-imenu t)
-  (lsp-enable-indentation nil)
-  (lsp-enable-links nil)
-  (lsp-enable-on-type-formatting nil)
-  (lsp-enable-suggest-server-download t)
-  (lsp-enable-symbol-highlighting nil)
-  (lsp-enable-text-document-color t)
-  ;; completion
-  (lsp-completion-enable t)
-  (lsp-completion-enable-additional-text-edit t)
-  (lsp-enable-snippet t)
-  (lsp-completion-show-kind nil)
-  (lsp-eldoc-enable-hover t)
-  (lsp-signature-render-documentation nil)
-  (lsp-signature-doc-lines 2)
-  ;; headerline
-  (lsp-headerline-breadcrumb-enable nil)
-  (lsp-headerline-breadcrumb-enable-diagnostics nil)
-  (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
-  (lsp-headerline-breadcrumb-icons-enable nil)
-  ;; modeline
-  (lsp-modeline-code-actions-enable nil)
-  (lsp-modeline-diagnostics-enable nil)
-  ;; lens
-  (lsp-lens-enable nil)
-  ;; semantic
-  (lsp-semantic-tokens-enable nil)
-  ;; Mine are better :
-  (lsp-disabled-clients '(emmet-ls eslint))
-  :init
-  (setq lsp-keymap-prefix "SPC l")
+  (lsp-bridge-enable-hover-diagnostic t)
   :config
-  (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
-  (advice-add (if (progn (require 'json)
-                         (fboundp 'json-parse-buffer))
-                  'json-parse-buffer
-                'json-read)
-              :around
-              #'lsp-booster--advice-json-parse)
-  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
-  (lsp-enable-which-key-integration t))
-
-(use-package lsp-metals
-  :after lsp-mode
-  :ensure t
-  :custom
-  (lsp-metals-server-args '("-Dmetals.allow-multiline-string-formatting=off"
-                            "-Dmetals.enable-best-effort=true"
-                            "-Dmetals.client=emacs"))
-  (lsp-metals-enable-indent-on-paste t))
+  (defun enable-lsp-bridge ()
+    (interactive)
+    (when-let* ((project (project-current))
+                (project-root (nth 2 project)))
+      (setq-local lsp-bridge-user-langserver-dir project-root
+                  lsp-bridge-user-multiserver-dir project-root))
+    (lsp-bridge-mode))
+  (add-to-list 'lsp-bridge-single-lang-server-mode-list '(ocaml-ts-mode . "ocamllsp"))
+  (add-to-list 'lsp-bridge-single-lang-server-mode-list '(scala-ts-mode . "metals"))
+  (add-to-list 'lsp-bridge-default-mode-hooks 'ocaml-ts-mode-hook)
+  (add-to-list 'lsp-bridge-default-mode-hooks 'reason-ts-mode-hook)
+  (add-to-list 'lsp-bridge-default-mode-hooks 'scala-ts-mode-hook)
+  (global-lsp-bridge-mode))
 
 ;; Eldoc for documentation
 (use-package eldoc
   :ensure nil
-  :hook ((lsp-mode emacs-lisp-mode) . eldoc-mode)
+  :hook (emacs-lisp-mode . eldoc-mode)
   :custom
   (eldoc-echo-area-use-multiline-p 1)
   (eldoc-echo-area-display-truncation-message t)
@@ -174,26 +82,10 @@
          (flycheck-error-list-mode . visual-line-mode))
   :bind ( :map
           flycheck-mode-map
-          ("M-g d" . #'flycheck-list-errors)
-          :map
-          evil-normal-state-map
-          ("]d" . #'next-error)
-          ("[d" . #'previous-error))
-  :preface
-  (defvar-local conf/flycheck-local-cache nil)
-  (defun conf/flycheck-checker-get (fn checker property)
-    (or (alist-get property (alist-get checker conf/flycheck-local-cache))
-        (funcall fn checker property)))
+          ("M-g d" . #'flycheck-list-errors))
   :custom
   (flycheck-emacs-lisp-load-path  'inherit)
-  (flycheck-javascript-eslint-executable "eslint_d")
-  :config
-  (advice-add 'flycheck-checker-get :around 'conf/flycheck-checker-get)
-
-  (add-hook 'lsp-managed-mode-hook
-            (lambda ()
-              (cond ((derived-mode-p 'typescript-ts-base-mode)
-                     (setq conf/flycheck-local-cache '((lsp . ((next-checkers . (javascript-biome)))))))))))
+  (flycheck-javascript-eslint-executable "eslint_d"))
 
 (use-package flycheck-deno
   :config

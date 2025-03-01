@@ -27,7 +27,7 @@
 (dolist (mode '(org-mode-hook eshell-mode-hook))
   (add-hook mode #'conf/disable-line-numbers-in-mode))
 
-(defvar conf/weight 'medium
+(defvar conf/weight 'regular
   "Weight used for faces throughout config.")
 
 (use-package fontaine
@@ -41,40 +41,29 @@
   (setq fontaine-presets
         `((regular)
           (t
-           :default-family "monospace"
+           :default-family "Rec Mono Duotone"
            :default-weight ,conf/weight
-           :default-height 120
+           :default-height 110
            :bold-family nil
            :bold-weight bold
            :italic-family nil
            :italic-slant italic
            :line-spacing nil
-           :fixed-pitch-family "monospace"
+           :fixed-pitch-family "Rec Mono Duotone"
            :fixed-pitch-weight ,conf/weight
            :fixed-pitch-height 1.0
            :fixed-pitch-serif-family nil
            :fixed-pitch-serif-weight regular
            :fixed-pitch-serif-height 1.0
            :variable-pitch-family "serif"
-           :variable-pitch-height 130
+           :variable-pitch-height 120
            :variable-pitch-weight regular)))
-  :config
   (fontaine-set-preset 'regular)
   (fontaine-mode))
 
-(use-package doom-themes
-  :custom
-  (doom-themes-enable-bold t)
-  (doom-xcode-padded-modeline t)
-
+(use-package standard-themes
   :config
-  (with-eval-after-load 'org
-    (doom-themes-org-config)
-    (doom-themes-enable-org-fontification))
-  (doom-themes-set-faces nil
-    '(tooltip :inherit 'fixed-pitch)
-    '(font-lock-comment-face :inherit 'italic))
-  (load-theme 'sonokai t))
+  (load-theme 'standard-dark t nil))
 
 ;; Cuz I may have the memory of a fish
 (use-package which-key
@@ -83,18 +72,6 @@
   :config
   (which-key-setup-side-window-right)
   (which-key-mode))
-
-;; A more minimal modeline. Maybe someday I'll actually customize the defualt in-built one.
-(use-package doom-modeline
-  :demand t
-  :custom-face
-  (doom-modeline-buffer-file ((t (:weight ,conf/weight))))
-  (doom-modeline-buffer-path ((t (:weight ,conf/weight))))
-  :init
-  (setq doom-modeline-icon nil)
-  :config
-  (column-number-mode)
-  (doom-modeline-mode))
 
 (use-package hide-mode-line
   :demand t

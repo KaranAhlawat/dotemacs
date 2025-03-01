@@ -12,8 +12,7 @@
             :version (lambda (_) (require 'tex-site) AUCTeX-version))
   :defer t
   :hook ((LaTeX-mode . prettify-symbols-mode)
-         (LaTeX-mode . turn-on-auto-fill)
-         (LaTeX-mode . lsp-deferred))
+         (LaTeX-mode . turn-on-auto-fill))
   :init
   (setq
    TeX-parse-self t

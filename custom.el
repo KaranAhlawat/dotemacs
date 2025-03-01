@@ -96,7 +96,9 @@
       (path-separator . ":") (null-device . "/dev/null"))
      (eshell-connection-default-profile (eshell-path-env-list))))
  '(custom-safe-themes
-   '("a690924a4483c8b8e42d62bc3f62d65d9e3cb40444de0f8c6ebfbca28baad579"
+   '("aa545934ce1b6fd16b4db2cf6c2ccf126249a66712786dd70f880806a187ac0b"
+     "3a1ce566a89c60056713fc4d4ca7ae9510dbe9f0097037c4e4417bdb54d27265"
+     "a690924a4483c8b8e42d62bc3f62d65d9e3cb40444de0f8c6ebfbca28baad579"
      "664a85fec4e3f4c6694f15ef4f16150c303e92771a4f316c9208756cc238be36"
      "6631f884f5f43e9d8eee42f5bcf8522a7f791688d2d2667ec135c129066be243"
      "4c7228157ba3a48c288ad8ef83c490b94cb29ef01236205e360c2c4db200bb18"
@@ -130,7 +132,8 @@
    '((scala-ts-mode :vc-backend Git :url
                     "https://github.com/KaranAhlawat/scala-ts-mode")))
  '(safe-local-variable-values
-   '((lsp-typescript-tsdk . "node_modules/typescript/lib")
+   '((eval progn (setq compile-command "esy dune build -w"))
+     (lsp-typescript-tsdk . "node_modules/typescript/lib")
      (lsp-clients-typescript-prefer-use-project-ts-server . t)
      (lsp-clients-typescript-preferences
       :importModuleSpecifierPreference "non-relative")
@@ -166,19 +169,7 @@
  '(evil-goggles-undo-redo-change-face ((t (:inherit diff-changed))))
  '(evil-goggles-undo-redo-remove-face ((t (:inherit diff-removed))))
  '(evil-goggles-yank-face ((t (:inherit diff-changed))))
- '(font-lock-comment-face ((t (:inherit italic))))
  '(keycast-key ((t)))
  '(line-number ((t (:inherit fixed-pitch))))
  '(line-number-current-line ((t (:inherit fixed-pitch))))
- '(org-block ((t (:inherit fixed-pitch))))
- '(org-block-begin-line ((t (:inherit fixed-pitch))))
- '(org-block-end-line ((t (:inherit org-block-begin-line))))
- '(org-checkbox ((t (:inherit fixed-pitch))))
- '(org-code ((t (:inherit fixed-pitch))))
- '(org-document-info-keyword ((t :inherit org-meta-line)))
- '(org-formula ((t (:inherit fixed-pitch))))
- '(org-meta-line ((t :inherit (font-lock-comment-face fixed-pitch))))
- '(org-special-keyword ((t (:inherit fixed-pitch))))
- '(org-table ((t (:inherit fixed-pitch))))
- '(org-verbatim ((t (:inherit fixed-pitch))))
  '(tooltip ((t (:inherit fixed-pitch)))))

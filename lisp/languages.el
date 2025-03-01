@@ -99,7 +99,9 @@
   :mode "\\.scala\\'"
   :ensure (:repo "/home/karan/repos/scala-ts-mode")
   :init
-  (setq scala-ts-indent-offset 4))
+  (setq scala-ts-indent-offset 2))
+
+(use-package fsharp-mode)
 
 (use-package fsharp-ts-mode
   :mode "\\.fs\\'"
@@ -107,21 +109,14 @@
   :init
   (setq fsharp-ts-indent-offset 4))
 
-(use-package reason-ts-mode
-  :mode "\\.re\\'"
-  :ensure (:repo "/home/karan/repos/reason-ts-mode"))
-
 (use-package yaml-ts-mode
   :ensure nil)
 
-(use-package tuareg)
+(use-package esy-mode
+  :ensure (:type git :host github :repo "ManasJayanth/esy-mode" :branch "master"))
 
-(use-package ocaml-ts-mode
-  :ensure ( :type git
-            :host github
-            :repo "terrateamio/ocaml-ts-mode" )
-  :after tuareg
-  :mode "\\.ml\\'")
+(use-package tuareg
+  :hook (tuareg-mode . esy-mode))
 
 (use-package lisp-extra-font-lock
   :ensure t

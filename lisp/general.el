@@ -19,7 +19,7 @@
   (setq use-dialog-box nil)
   (setq xref-search-program 'ripgrep)
   (setq custom-theme-directory (locate-user-emacs-file "themes"))
-  (setq initial-scratch-message "Welcome to Emacs! Let's get to work")
+  (setq initial-scratch-message "Welcome to Emacs! Let\'s get to work")
   (setq inhibit-startup-message t)
   (setq auto-mode-case-fold nil)
   (setq-default bidi-display-reordering 'left-to-right
@@ -64,7 +64,7 @@
      "package.json"
      "deno.json"
      "build.sbt"
-     "build.sc"
+     "build.mill"
      "mix.exs"
      "Cargo.toml"
      "*.fsproj"
